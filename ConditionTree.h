@@ -1,8 +1,13 @@
 
 #pragma once
+
+// basic includes
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
+
+// self definitions
 #define MAX_NAME 100
 
 
