@@ -14,7 +14,7 @@
 typedef enum {
     NODE_AND,
     NODE_OR,
-    NODE_NOR,
+    NODE_NOT,
     NODE_FACT,
     NODE_COMPARE
 }Type;
@@ -29,7 +29,7 @@ typedef enum{
 }CompareOp;
 
 typedef struct Node{
-    Type* type;
+    Type type;
     
     union{
         struct {
@@ -47,7 +47,7 @@ typedef struct Node{
         struct{
             char factName[MAX_NAME];
             CompareOp op;
-            double value;
+            double val;
         } Compare;
 
     } data;

@@ -28,4 +28,4 @@ typedef struct{
 double getNumFact(FactDB* db, const char* name);
 bool getBoolFact(FactDB* db, const char* name);
 
-
+bool evaluate(FactDB* db, Node* n);
