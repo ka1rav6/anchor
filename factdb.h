@@ -1,11 +1,12 @@
 #pragma once
 
 #include <string.h>
-
+#include <math.h>
 // custom includes
 #include "ConditionTree.h"
  
 #define MAX_FACTS 300
+#define NOT_FOUND NAN
 
 typedef struct{
     char name[MAX_NAME] ;
@@ -19,12 +20,12 @@ typedef struct{
 
 typedef struct{
     BoolFact boolFacts[MAX_FACTS];
-    size_t boolCount;
     NumFact numFacts[MAX_FACTS];
+    size_t boolCount;
     size_t numCount;
 }FactDB;
 
 double getNumFact(FactDB* db, const char* name);
-bool getBoolFact(FactDB db, const char* name);
+bool getBoolFact(FactDB* db, const char* name);
 
 
