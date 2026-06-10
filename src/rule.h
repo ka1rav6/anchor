@@ -5,8 +5,6 @@
 #include <math.h>
 #include <stdbool.h>
 
-
-#include "ConditionTree.h"
 #include "factdb.h"
 
 #define MAX_ACTION_NAME 64
