@@ -73,4 +73,59 @@ Node* build_node(yyjson_val* v){
     }
     return NULL;
 }
+Node* build_fact(yyjson_val* v){
+    Node* n = createNode(NODE_FACT);
+    n->data.Fact.factName = strdup(yyjson_get_str(v));
+    return n;
+}
+
+Node* build_compare(const char* op, yyjson_val* arr){
+    Node* n = createNode(NODE_COMPARE);
+
+    yyjson_val* left = yyjson_arr_get(arr, 0);
+    yyjson_val* right = yyjson_arr_get(arr, 1);
+    n->data.Compare.factName = strdup(yyjson_get_str(left));
+    n->data.Compare.val = yyjson_get_real(right);
+    if (strcmp(op, ">") == 0) n->data.Compare.op = OP_GT;
+    else if (strcmp(op, "<") == 0) n->data.Compare.op = OP_LT;
+    else if (strcmp(op, ">=") == 0) n->data.Compare.op = OP_GE;
+    else if (strcmp(op, "<=") == 0) n->data.Compare.op = OP_LE;
+    else if (strcmp(op, "==") == 0) n->data.Compare.op = OP_EQ;
+    else if (strcmp(op, "!=") == 0) n->data.Compare.op = OP_NE;
+
+    return n;
+}
+
+Node* build_and(yyjson_val* arr){
+    size_t len = yyjson_arr_size(arr);
+
+    Node* left = build_node(yyjson_arr_get(arr, 0));
+    for (size_t i = 1; i < len; i++){
+        Node* right = build_node(yyjson_arr_get(arr, i));
+        Node* parent = createNode(NODE_AND);
+        parent->data.op.left = left;
+        parent->data.op.right = right;
+        left = parent;
+    }
+    return left;
+}
+
+Node* build_or(yyjson_val* arr){
+    size_t len = yyjson_arr_size(arr);
+    Node* left = build_node(yyjson_arr_get(arr, 0));
+    for (size_t i = 1; i < len; i++){
+        Node* right = build_node(yyjson_arr_get(arr, i));
+        Node* parent = createNode(NODE_OR);
+        parent->data.op.left = left;
+        parent->data.op.right = right;
+        left = parent;
+    }
+    return left;
+}
+
+Node* build_not(yyjson_val* v){
+    Node* n = createNode(NODE_NOT);
+    n->data.unary.child = build_node(v);
+    return n;
+}
 
