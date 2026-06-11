@@ -1,0 +1,16 @@
+{
+    "rules": [
+        {
+            "name": "canAccessDashboard",
+            "action": "ALLOW_DASHBOARD",
+            "if": {
+                "and": [
+                    "isAdmin",
+                    {
+                        ">": ["age", 18]
+                    }
+                ]
+            }
+        }
+    ]
+}
