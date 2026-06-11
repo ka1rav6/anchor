@@ -1,7 +1,4 @@
-#include "ConditionTree.h"
-
-#include <string.h>
-#include <yyjson.h>
+#include "jsonParser.h"
 
 yyjson_doc* parseJSON(const char * file){
     yyjson_doc * doc = yyjson_read_file(file, 0, NULL, NULL);
@@ -12,3 +9,8 @@ yyjson_doc* parseJSON(const char * file){
     return doc;
 }
 
+
+RuleEngine* build_ast(yyjson_doc* doc){
+    
+
+}
