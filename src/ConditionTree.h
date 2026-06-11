@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-
+#include <string.h>
 
 // self definitions
 #define MAX_NAME 100
@@ -39,14 +39,19 @@ typedef struct Node{
         }unary;
         
         struct {
-            char factName[MAX_NAME];
+            char *factName;
         }Fact;
         
         struct{
-            char factName[MAX_NAME];
+            char *factName;
             CompareOp op;
             double val;
         } Compare;
 
     } data;
 } Node;
+
+
+
+void deleteNode(Node*);
+Node* createNode(Type);
