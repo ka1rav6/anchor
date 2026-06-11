@@ -2,16 +2,6 @@
 
 #include "rule.h"
 
-// WILL CHANGE THIS SOON
-#define RULE "RULE"
-#define FACT "FACT"
-#define COND "COND"
-#define AND "AND"
-#define OR "OR"
-#define NOT "NOT"
-#define HASTAG '#'
-
-
 /*
 NOTE THE ASSUMPTIONS:
 1. Language has only keywords : RULE, FACT, COND, AND, OR, NOT (ALWAYS ALL CAPS)
@@ -92,9 +82,9 @@ typedef struct SLexer{
     char ch;
 }Lexer;
 
-void readChar(Lexer* l);
+void readChar(Lexer*);
 Lexer* initLexer(const char*);
-
+TokenType nextToken(Lexer*);
     
 Program* readFile(const char* file); // reads a file and converts it into a program;  
 Node* processLine(const char* line);

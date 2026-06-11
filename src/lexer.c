@@ -20,7 +20,7 @@ void readChar(Lexer* l){
     l->readPos ++;
 }
 
-TokenType* nextToken(Lexer* l){
+TokenType nextToken(Lexer* l){
     TokenType t;
     switch (l->ch){
         case '$':
