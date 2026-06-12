@@ -125,7 +125,7 @@ Node* build_compare(const char* op, yyjson_val* arr){
     yyjson_val* left = yyjson_arr_get(arr, 0);
     yyjson_val* right = yyjson_arr_get(arr, 1);
     n->data.Compare.factName = strdup(yyjson_get_str(left));
-    n->data.Compare.val = yyjson_get_real(right);
+    n->data.Compare.val = (double)yyjson_get_int(right);
     if (strcmp(op, ">") == 0) n->data.Compare.op = OP_GT;
     else if (strcmp(op, "<") == 0) n->data.Compare.op = OP_LT;
     else if (strcmp(op, ">=") == 0) n->data.Compare.op = OP_GE;

@@ -2,7 +2,7 @@
     "facts": {
         "isAdmin": true,
         "canAccessDashboard": true,
-        "age": 25
+        "age": 10
     },
     "rules": [
         {
