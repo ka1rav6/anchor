@@ -67,7 +67,7 @@ RuleEngine* build_ast(yyjson_doc* doc, FactDB* db) {
         Rule r;
         r.ruleName = strdup(yyjson_get_str(name));
         r.action = strdup(yyjson_get_str(action));
-        r.condition = build_node(cond);
+        r.condition = build_node(db, cond);
         
         addRule(engine, &r);
     }
@@ -79,10 +79,10 @@ RuleEngine* build_ast(yyjson_doc* doc, FactDB* db) {
  * 
  */
 
-Node* build_node(yyjson_val* v){
+Node* build_node(FactDB* db, yyjson_val* v){
     // FACT STRING
     if (yyjson_is_str(v))
-        return build_fact(v);
+        return build_fact(db, v);
     if (!yyjson_is_obj(v))
         return NULL;
 
@@ -97,13 +97,13 @@ Node* build_node(yyjson_val* v){
             perror("");
         }
         if (strcmp(op, "and") == 0)
-            return build_and(val);
+            return build_and(db, val);
 
         if (strcmp(op, "or") == 0)
-            return build_or(val);
+            return build_or(db, val);
 
         if (strcmp(op, "not") == 0)
-            return build_not(val);
+            return build_not(db, val);
 
         if (strcmp(op, ">") == 0 ||
             strcmp(op, "<") == 0 ||
@@ -112,29 +112,44 @@ Node* build_node(yyjson_val* v){
             strcmp(op, "==") == 0 ||
             strcmp(op, "!=") == 0)
         {
-            return build_compare(op, val);
+            return build_compare(db, op, val);
         }
     }
     return NULL;
 }
-Node* build_fact(yyjson_val* v){
+Node* build_fact(FactDB* db, yyjson_val* v){
     Node* n = createNode(NODE_FACT);
     n->data.Fact.factName = strdup(yyjson_get_str(v));
     return n;
 }
 
-Node* build_compare(const char* op, yyjson_val* arr){
+Node* build_compare(FactDB* db, const char* op, yyjson_val* arr){
     Node* n = createNode(NODE_COMPARE);
  
     yyjson_val* left = yyjson_arr_get(arr, 0);
     yyjson_val* right = yyjson_arr_get(arr, 1);
     n->data.Compare.factName = strdup(yyjson_get_str(left));
+    printf("fact = %s\n", yyjson_get_str(left)); 
+    if (!isComparisonCorrect(db, n->data.Compare.factName)){
+        fprintf(stderr, "Incorrect: Tried comparing bool with number : %s", n->data.Compare.factName);
+        perror("");
+    }
+        
+    if (yyjson_is_int(right)) {
+        printf("rhs int = %lld\n",
+           (long long)yyjson_get_int(right));
 
-    if (yyjson_is_int(right))
-        n->data.Compare.val = yyjson_get_int(right);
-    if (yyjson_is_real(right))
+       n->data.Compare.val = yyjson_get_int(right);
+    }
+    if (yyjson_is_real(right)) {
+        printf("rhs real = %f\n",
+           yyjson_get_real(right));
+
         n->data.Compare.val = yyjson_get_real(right);
-    if (n->data.Compare.val == NAN)
+    }
+
+    printf("stored rhs = %f\n", n->data.Compare.val);
+    if (isnan(n->data.Compare.val))
         printf("Invalid comparison value for fact '%s'\n", n->data.Compare.factName);
     if (strcmp(op, ">") == 0) n->data.Compare.op = OP_GT;
     else if (strcmp(op, "<") == 0) n->data.Compare.op = OP_LT;
@@ -146,12 +161,12 @@ Node* build_compare(const char* op, yyjson_val* arr){
     return n;
 }
 
-Node* build_and(yyjson_val* arr){
+Node* build_and(FactDB* db, yyjson_val* arr){
     size_t len = yyjson_arr_size(arr);
 
-    Node* left = build_node(yyjson_arr_get(arr, 0));
+    Node* left = build_node(db, yyjson_arr_get(arr, 0));
     for (size_t i = 1; i < len; i++){
-        Node* right = build_node(yyjson_arr_get(arr, i));
+        Node* right = build_node(db, yyjson_arr_get(arr, i));
         Node* parent = createNode(NODE_AND);
         parent->data.op.left = left;
         parent->data.op.right = right;
@@ -160,11 +175,11 @@ Node* build_and(yyjson_val* arr){
     return left;
 }
 
-Node* build_or(yyjson_val* arr){
+Node* build_or(FactDB* db, yyjson_val* arr){
     size_t len = yyjson_arr_size(arr);
-    Node* left = build_node(yyjson_arr_get(arr, 0));
+    Node* left = build_node(db, yyjson_arr_get(arr, 0));
     for (size_t i = 1; i < len; i++){
-        Node* right = build_node(yyjson_arr_get(arr, i));
+        Node* right = build_node(db, yyjson_arr_get(arr, i));
         Node* parent = createNode(NODE_OR);
         parent->data.op.left = left;
         parent->data.op.right = right;
@@ -173,14 +188,13 @@ Node* build_or(yyjson_val* arr){
     return left;
 }
 
-Node* build_not(yyjson_val* v){
+Node* build_not(FactDB* db, yyjson_val* v){
     Node* n = createNode(NODE_NOT);
-    n->data.unary.child = build_node(v);
+    n->data.unary.child = build_node(db, v);
     return n;
 }
 
-void build_factdb(FactDB* db, yyjson_val* root)
-{
+void build_factdb(FactDB* db, yyjson_val* root){
     yyjson_val* facts = yyjson_obj_get(root, "facts");
 
     if (!facts || !yyjson_is_obj(facts))

@@ -1,8 +1,4 @@
-#include <stdio.h>
-#include <yyjson.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <string.h>
+#include "semanticChecker.h"
 
 /*
  * checks to include:
@@ -18,4 +14,15 @@ bool isOperator(const char* op){
             return true;
     }
     return false;
+}
+
+
+bool isComparisonCorrect(FactDB* db, const char* factname){
+    // to check if the fact is of bool type but is used in a comparison expression
+    for (int i = 0; i < db->boolCount; i++){
+        if (strcmp(db->boolFacts[i].name, factname) == 0){
+            return false;
+        }
+    }
+    return true;
 }

@@ -7,10 +7,10 @@ yyjson_doc* parseJSON(const char*);
 
 RuleEngine* build_ast(yyjson_doc*, FactDB*);
 
-Node* build_node(yyjson_val*);
-Node* build_and(yyjson_val*);
-Node* build_fact(yyjson_val*);
-Node* build_not(yyjson_val*);
-Node* build_or(yyjson_val*);
-Node* build_compare(const char*, yyjson_val*);
+Node* build_node(FactDB*, yyjson_val*);
+Node* build_and(FactDB*, yyjson_val*);
+Node* build_fact(FactDB*, yyjson_val*);
+Node* build_not(FactDB*, yyjson_val*);
+Node* build_or(FactDB*, yyjson_val*);
+Node* build_compare(FactDB*, const char*, yyjson_val*);
 void build_factdb(FactDB*, yyjson_val*);
