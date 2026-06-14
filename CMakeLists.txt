@@ -3,6 +3,9 @@ project(rule_engine C)
 
 find_library(YYJSON_LIB yyjson)
 
+# Debug flags for Valgrind
+set(CMAKE_C_FLAGS_DEBUG "-g -O0")
+
 add_executable(engine 
     src/factdb.c 
     src/factdb.h 
@@ -18,3 +21,20 @@ add_executable(engine
 )
 
 target_link_libraries(engine ${YYJSON_LIB})
+
+# Find Valgrind
+find_program(VALGRIND_EXECUTABLE valgrind)
+
+if(VALGRIND_EXECUTABLE)
+    add_custom_target(
+        valgrind
+        COMMAND ${VALGRIND_EXECUTABLE}
+                --leak-check=full
+                --show-leak-kinds=all
+                --track-origins=yes
+                --verbose
+                $<TARGET_FILE:engine>
+        DEPENDS engine
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    )
+endif()
