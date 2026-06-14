@@ -3,6 +3,10 @@
 #include "rule.h"
 #include "jsonParser.h"
 
+// A SIMPLE TEST FILE TO TEST THE FUNCTIONALITY OF THE FACT DB AND THE AST BUILDING AND EVALUATION
+// PRINTING FUNCTIONS AND A MAIN FUNCTION (mainly for testing purposes) ARE ALSO INCLUDED HERE
+
+
 void printIndent(int depth){
     for (int i = 0; i < depth; i++)
         printf("  ");
