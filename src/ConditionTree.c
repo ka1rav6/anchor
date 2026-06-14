@@ -2,7 +2,11 @@
 
 void deleteNode(Node* n){
     switch (n->type){
-        case (NODE_AND || NODE_NOT) :
+        case (NODE_AND) :
+            deleteNode(n->data.op.left);
+            deleteNode(n->data.op.right);
+            break;
+        case (NODE_OR):
             deleteNode(n->data.op.left);
             deleteNode(n->data.op.right);
             break;
@@ -11,8 +15,10 @@ void deleteNode(Node* n){
             break;
         case NODE_FACT:
             free(n->data.Fact.factName);
+            break;
         case NODE_COMPARE:
             free(n->data.Compare.factName);
+            break;
     }
     free(n);
     n = NULL;
@@ -20,22 +26,11 @@ void deleteNode(Node* n){
 
 Node* createNode(Type t){
     Node* temp = (Node*)malloc(sizeof(Node));
+    if (temp == NULL){
+        fprintf(stderr, "Memory allocation failed\n");
+        exit(EXIT_FAILURE);
+    }
     memset(temp, 0, sizeof(Node));
     temp->type = t;
-
-    switch(t){
-        case (NODE_AND || NODE_NOT) :
-            temp->data.op.left = malloc(sizeof(Node));
-            temp->data.op.right = malloc(sizeof(Node));
-            break;
-        case NODE_NOT:
-            temp->data.unary.child = malloc(sizeof(Node));
-            break;
-        case NODE_FACT:
-            temp->data.Fact.factName = (char*)malloc(MAX_NAME * sizeof(char));
-        case NODE_COMPARE:
-            temp->data.Compare.factName = (char*)malloc(MAX_NAME * sizeof(char));
-        break;
-    }
     return temp;
 }

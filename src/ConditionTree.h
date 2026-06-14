@@ -1,3 +1,5 @@
+#pragma once
+
 
 //basic includes
 #include <stdio.h>

@@ -147,7 +147,7 @@ Node* build_fact(FactDB* db, yyjson_val* v){
 
 Node* build_compare(FactDB* db, const char* op, yyjson_val* arr){
     Node* n = createNode(NODE_COMPARE);
- 
+    n->data.Compare.val = NAN;  
     yyjson_val* left = yyjson_arr_get(arr, 0);
     yyjson_val* right = yyjson_arr_get(arr, 1);
     n->data.Compare.factName = strdup(yyjson_get_str(left));
@@ -157,10 +157,10 @@ Node* build_compare(FactDB* db, const char* op, yyjson_val* arr){
         exit(EXIT_FAILURE);
     }
     if (yyjson_is_int(right))
-       n->data.Compare.val = yyjson_get_int(right);
+       n->data.Compare.val = (double)yyjson_get_int(right);
 
     if (yyjson_is_real(right))
-        n->data.Compare.val = yyjson_get_real(right);
+        n->data.Compare.val = (double)yyjson_get_real(right);
 
     if (isnan(n->data.Compare.val)){
         fprintf(stderr, "Invalid comparison value (NAN) for fact '%s'\n", n->data.Compare.factName);
