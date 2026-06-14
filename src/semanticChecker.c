@@ -47,11 +47,9 @@ bool factExists(FactDB* db, const char* fact, factType t){
 }
 
 bool duplicateRule(RuleEngine* e, const char* name){
-    for (int i = 0; i < e->ruleCount; i++){
-        if (strcmp(e->rules[i].ruleName, name) == 0)
-            return true;
-    }
-    return false;
+    Rule* r;
+    HASH_FIND_STR(e->rules, name, r);
+    return (bool)r;
 }
 
 bool isMixedBoolNumArray(FactDB* db, yyjson_val* arr){

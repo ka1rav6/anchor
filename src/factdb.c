@@ -32,8 +32,6 @@ bool evaluate(FactDB* db, Node* n){
         case NODE_COMPARE:{
             double lhs = getNumFact(db, n->data.Compare.factName);
             double rhs = n->data.Compare.val;
-            printf("DEBUG COMPARE: %s = %f vs %f\n",
-                n->data.Compare.factName, lhs, rhs);
             switch(n->data.Compare.op){
                 case OP_LT:
                     return lhs < rhs;
