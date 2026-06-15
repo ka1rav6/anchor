@@ -1,5 +1,5 @@
 #include "engine.h"
-
+#include "jsonParser.h"
 Engine* createMainEngine(FactDB* db, RuleEngine* e, const char* json_file){
     Engine* temp = (Engine*)malloc(sizeof(Engine));
     if (!temp){
@@ -18,6 +18,7 @@ Engine* createMainEngine(FactDB* db, RuleEngine* e, const char* json_file){
         exit(EXIT_FAILURE);
     }
     temp->json_file = json_file;
+    temp->r_engine = build_ast(parseJSON(json_file), temp->db);
     return temp;
 }
 
