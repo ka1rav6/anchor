@@ -1,6 +1,7 @@
 #include "rule.h"
 #include "jsonParser.h"
 #include "semanticChecker.h"
+#include "ActionEntry.h"
 
 /*
  * Checks if file exists in file system 
@@ -80,6 +81,11 @@ RuleEngine* build_ast(yyjson_doc* doc, FactDB* db) {
         memset(r, 0, sizeof(Rule));
         strcpy(r->ruleName, yyjson_get_str(name));
         r->action = strdup(yyjson_get_str(action));
+        ActionEntry* ae = lookupAction(r->action);
+        if (ae) {
+            r->func = ae->func;
+            r->ctx  = ae->ctx;
+        }
         r->condition = build_node(db, cond);
         if (duplicateRule(engine, r->ruleName)){
             fprintf(stderr, "Two different rules have the same name : %s", r->ruleName);

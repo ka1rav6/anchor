@@ -21,6 +21,8 @@ add_executable(engine
     src/uthash.h
     src/engine.c
     src/engine.h
+        src/ActionEntry.c
+        src/ActionEntry.h
 )
 
 target_link_libraries(engine ${YYJSON_LIB})
