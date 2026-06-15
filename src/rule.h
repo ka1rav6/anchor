@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <stdbool.h>
+#include <stdarg.h>
 
 #include "factdb.h"
 
@@ -11,10 +12,14 @@
 #define MAX_RULE_NAME 64
 #define MAX_RULES 1000
 
+typedef void (*Action_f)(FactDB* db, void* ctx);
+
+
 typedef struct {
     Node* condition;
     char *action;
     char ruleName[MAX_RULE_NAME];
+    Action_f func;
 
     UT_hash_handle hh; // makes this structure hashable [implemented using uthash]
 }Rule;
@@ -29,4 +34,5 @@ RuleEngine* createEngine();
 void addRule(RuleEngine*, Rule*);
 void deleteRule(Rule*);
 void deleteEngine(RuleEngine*);
-
+void linkToRule(RuleEngine*, const char* name, Action_f); // name = rule name
+void callFunc(Rule r);
