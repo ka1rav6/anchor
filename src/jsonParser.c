@@ -1,7 +1,6 @@
 #include "rule.h"
 #include "jsonParser.h"
 #include "semanticChecker.h"
-#include "ActionEntry.h"
 
 /*
  * Checks if file exists in file system 
@@ -47,7 +46,7 @@ yyjson_doc* parseJSON(const char * file){
  * @param 2 : pointer to the fact DB that is changed in place.
  * @return : the complete engine (AST)
  */
-RuleEngine* build_ast(yyjson_doc* doc, FactDB* db) {
+RuleEngine* build_ast(yyjson_doc* doc, FactDB* db, ActionEntry* g_registry){
     // 1. Builds the fact DB:
     yyjson_val* root = yyjson_doc_get_root(doc);
     build_factdb(db, root);
@@ -81,7 +80,7 @@ RuleEngine* build_ast(yyjson_doc* doc, FactDB* db) {
         memset(r, 0, sizeof(Rule));
         strcpy(r->ruleName, yyjson_get_str(name));
         r->action = strdup(yyjson_get_str(action));
-        ActionEntry* ae = lookupAction(r->action);
+        ActionEntry* ae = lookupAction(g_registry, r->action);
         if (ae) {
             r->func = ae->func;
             r->ctx  = ae->ctx;

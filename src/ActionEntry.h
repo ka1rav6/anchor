@@ -1,9 +1,10 @@
+#pragma once
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stdbool.h>
 #include "rule.h"
 #include "uthash.h"
-
 
 typedef struct {
     char action[MAX_ACTION_NAME];
@@ -12,11 +13,6 @@ typedef struct {
     UT_hash_handle hh;
 } ActionEntry;
 
-static ActionEntry* g_registry = NULL;
-
-void registerAction(const char* action, Action_f func, void* ctx);
-void registerActions(ActionEntry*);
-ActionEntry* createEntry(const char* action, Action_f func, void* ctx);
-
-ActionEntry* lookupAction(const char* action); 
-void freeRegistry(void);
+void registerAction(ActionEntry**, const char* action, Action_f func, void* ctx);
+ActionEntry* lookupAction(ActionEntry*, const char* action);
+void freeRegistry(ActionEntry**);

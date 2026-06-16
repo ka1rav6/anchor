@@ -1,6 +1,4 @@
 #include "engine.h"
-#include "ActionEntry.h"
-
 
 Engine* createMainEngine(const char* json_file){
     Engine* temp = (Engine*)malloc(sizeof(Engine));
@@ -17,29 +15,27 @@ Engine* createMainEngine(const char* json_file){
     }
     temp->json_file = json_file;
     temp->db = createFactDB();
-    temp->r_engine = build_ast(parseJSON(json_file), temp->db);
+    temp->r_engine = build_ast(parseJSON(json_file), temp->db, temp->action_registry);
     return temp;
 }
-
 
 void destroyMainEngine(Engine* e){
     deleteFactDB(e->db);
     deleteEngine(e->r_engine);
+    freeRegistry(&e->action_registry);
     free(e);
-    e = NULL;
-    freeRegistry();
 }
 
-void linkToRule(Engine* e, const char* name, Action_f f, void* ctx){
-    Rule* r = findRule(e->r_engine, name);
-    if (!r) {
-        fprintf(stderr, "Rule %s not found\n", name);
-        perror("");
-        exit(EXIT_FAILURE);
+void registerTheAction(Engine* e, const char* name, Action_f f, void* ctx){
+    registerAction(&e->action_registry, name, f, ctx);
+    Rule *r, *tmp;
+    HASH_ITER(hh, e->r_engine->rules, r, tmp) {
+        if (strcmp(r->action, name) == 0) {
+            r->func = f;
+            r->ctx  = ctx;
+        }
     }
-    r->func = f;
-    r->ctx = ctx;
-} // name = rule name
+}
 
 void runMainEngine(Engine* e){
     run(e->r_engine, e->db);

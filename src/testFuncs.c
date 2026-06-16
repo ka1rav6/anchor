@@ -1,6 +1,5 @@
 #include "uthash.h"
 #include "engine.h"
-#include "ActionEntry.h"
 
 /* ── pass/fail counters ──────────────────────────────────────────────────── */
 
@@ -109,40 +108,40 @@ int main(void){
 
     /* Register callbacks BEFORE creating the engine.
        The engine wires them automatically during build_ast. */
-
+       
+       /* Engine creation — callbacks are wired automatically */
+       Engine* e = createMainEngine("../src/test.json");
     // --- rules that SHOULD fire ---
-    registerAction("SIMPLE_BOOL_FIRED",        cb_pass, "SIMPLE_BOOL_FIRED: isAdmin=true");
-    registerAction("AGE_OVER_18",              cb_pass, "AGE_OVER_18: age(25)>18");
-    registerAction("SCORE_UNDER_100",          cb_pass, "SCORE_UNDER_100: score(42)<100");
-    registerAction("BALANCE_GE_1500",          cb_pass, "BALANCE_GE_1500: balance(1500)>=1500");
-    registerAction("LOGIN_ATTEMPTS_LE_5",      cb_pass, "LOGIN_ATTEMPTS_LE_5: loginAttempts(2)<=5");
-    registerAction("ITEM_COUNT_EQUALS_3",      cb_pass, "ITEM_COUNT_EQUALS_3: itemCount==3");
-    registerAction("FEVER_DETECTED",           cb_pass, "FEVER_DETECTED: temperature(98.6)>98.0");
-    registerAction("ADMIN_AND_VERIFIED",       cb_pass, "ADMIN_AND_VERIFIED: isAdmin&&isVerified");
-    registerAction("REGULAR_OR_PREMIUM",       cb_pass, "REGULAR_OR_PREMIUM: isPremium=true");
-    registerAction("NOT_BANNED",               cb_pass, "NOT_BANNED: !isBanned");
-    registerAction("ADMIN_VERIFIED_PREMIUM",   cb_pass, "ADMIN_VERIFIED_PREMIUM");
-    registerAction("GUEST_OR_REGULAR_OR_ADMIN",cb_pass, "GUEST_OR_REGULAR_OR_ADMIN: isAdmin=true");
-    registerAction("ADULT_WITH_BALANCE",       cb_pass, "ADULT_WITH_BALANCE: age>18&&balance>=1000");
-    registerAction("HIGH_SCORE_OR_PREMIUM",    cb_pass, "HIGH_SCORE_OR_PREMIUM: isPremium=true");
-    registerAction("NOT_HIGH_RISK_LOGIN",      cb_pass, "NOT_HIGH_RISK_LOGIN: !(loginAttempts>10)");
-    registerAction("NESTED_AND_OR_FIRED",      cb_pass, "NESTED_AND_OR_FIRED");
-    registerAction("NESTED_OR_AND_FIRED",      cb_pass, "NESTED_OR_AND_FIRED: isVerified&&age>18");
-    registerAction("DEEP_NEST_FIRED",          cb_pass, "DEEP_NEST_FIRED");
-    registerAction("NEITHER_BANNED_NOR_GUEST", cb_pass, "NEITHER_BANNED_NOR_GUEST: !(banned||guest)");
-    registerAction("NOT_BOTH_GUEST_AND_BANNED",cb_pass, "NOT_BOTH_GUEST_AND_BANNED: !(guest&&banned)");
-    registerAction("LOYAL_HIGH_SPENDER",       cb_pass, "LOYAL_HIGH_SPENDER: accountAgeDays>=300&&balance>1000");
-    registerAction("SCORE_IN_RANGE",           cb_pass, "SCORE_IN_RANGE: 0<=score<=100");
-    registerAction("NO_DISCOUNT_HAS_ITEMS",    cb_pass, "NO_DISCOUNT_HAS_ITEMS: discount==0&&itemCount>0");
-    registerAction("FULL_ACCESS_GRANTED",      cb_pass, "FULL_ACCESS_GRANTED");
+    registerTheAction(e, "SIMPLE_BOOL_FIRED",        cb_pass, "SIMPLE_BOOL_FIRED: isAdmin=true");
+    registerTheAction(e, "AGE_OVER_18",              cb_pass, "AGE_OVER_18: age(25)>18");
+    registerTheAction(e, "SCORE_UNDER_100",          cb_pass, "SCORE_UNDER_100: score(42)<100");
+    registerTheAction(e, "BALANCE_GE_1500",          cb_pass, "BALANCE_GE_1500: balance(1500)>=1500");
+    registerTheAction(e, "LOGIN_ATTEMPTS_LE_5",      cb_pass, "LOGIN_ATTEMPTS_LE_5: loginAttempts(2)<=5");
+    registerTheAction(e, "ITEM_COUNT_EQUALS_3",      cb_pass, "ITEM_COUNT_EQUALS_3: itemCount==3");
+    registerTheAction(e, "FEVER_DETECTED",           cb_pass, "FEVER_DETECTED: temperature(98.6)>98.0");
+    registerTheAction(e, "ADMIN_AND_VERIFIED",       cb_pass, "ADMIN_AND_VERIFIED: isAdmin&&isVerified");
+    registerTheAction(e, "REGULAR_OR_PREMIUM",       cb_pass, "REGULAR_OR_PREMIUM: isPremium=true");
+    registerTheAction(e, "NOT_BANNED",               cb_pass, "NOT_BANNED: !isBanned");
+    registerTheAction(e, "ADMIN_VERIFIED_PREMIUM",   cb_pass, "ADMIN_VERIFIED_PREMIUM");
+    registerTheAction(e, "GUEST_OR_REGULAR_OR_ADMIN",cb_pass, "GUEST_OR_REGULAR_OR_ADMIN: isAdmin=true");
+    registerTheAction(e, "ADULT_WITH_BALANCE",       cb_pass, "ADULT_WITH_BALANCE: age>18&&balance>=1000");
+    registerTheAction(e, "HIGH_SCORE_OR_PREMIUM",    cb_pass, "HIGH_SCORE_OR_PREMIUM: isPremium=true");
+    registerTheAction(e, "NOT_HIGH_RISK_LOGIN",      cb_pass, "NOT_HIGH_RISK_LOGIN: !(loginAttempts>10)");
+    registerTheAction(e, "NESTED_AND_OR_FIRED",      cb_pass, "NESTED_AND_OR_FIRED");
+    registerTheAction(e, "NESTED_OR_AND_FIRED",      cb_pass, "NESTED_OR_AND_FIRED: isVerified&&age>18");
+    registerTheAction(e, "DEEP_NEST_FIRED",          cb_pass, "DEEP_NEST_FIRED");
+    registerTheAction(e, "NEITHER_BANNED_NOR_GUEST", cb_pass, "NEITHER_BANNED_NOR_GUEST: !(banned||guest)");
+    registerTheAction(e, "NOT_BOTH_GUEST_AND_BANNED",cb_pass, "NOT_BOTH_GUEST_AND_BANNED: !(guest&&banned)");
+    registerTheAction(e, "LOYAL_HIGH_SPENDER",       cb_pass, "LOYAL_HIGH_SPENDER: accountAgeDays>=300&&balance>1000");
+    registerTheAction(e, "SCORE_IN_RANGE",           cb_pass, "SCORE_IN_RANGE: 0<=score<=100");
+    registerTheAction(e, "NO_DISCOUNT_HAS_ITEMS",    cb_pass, "NO_DISCOUNT_HAS_ITEMS: discount==0&&itemCount>0");
+    registerTheAction(e, "FULL_ACCESS_GRANTED",      cb_pass, "FULL_ACCESS_GRANTED");
 
     // --- rules that should NOT fire ---
-    registerAction("SHOULD_NOT_FIRE",     cb_should_not_fire, "SHOULD_NOT_FIRE (isBanned=false)");
-    registerAction("DISCOUNT_NOT_ZERO",   cb_should_not_fire, "DISCOUNT_NOT_ZERO (discount==0)");
-    registerAction("SHOULD_NOT_FIRE_NOT", cb_should_not_fire, "SHOULD_NOT_FIRE_NOT (!isAdmin=false)");
+    registerTheAction(e, "SHOULD_NOT_FIRE",     cb_should_not_fire, "SHOULD_NOT_FIRE (isBanned=false)");
+    registerTheAction(e, "DISCOUNT_NOT_ZERO",   cb_should_not_fire, "DISCOUNT_NOT_ZERO (discount==0)");
+    registerTheAction(e, "SHOULD_NOT_FIRE_NOT", cb_should_not_fire, "SHOULD_NOT_FIRE_NOT (!isAdmin=false)");
 
-    /* Engine creation — callbacks are wired automatically */
-    Engine* e = createMainEngine("../src/test.json");
 
     printf("\n=== FACT DATABASE ===\n");
     printFactDB(e->db);

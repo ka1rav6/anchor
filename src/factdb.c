@@ -62,7 +62,7 @@ bool evaluate(FactDB* db, Node* n){
             }
         }
     }
-
+    return false;
 }
 
 // constructor for factDB 
