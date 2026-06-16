@@ -1,6 +1,6 @@
 #include "engine.h"
 
-Engine* createMainEngine(const char* json_file){
+Engine* createEngine(const char* json_file){
     Engine* temp = (Engine*)malloc(sizeof(Engine));
     if (!temp){
         fprintf(stderr, "The engine memory could not be allocated\n");
@@ -19,9 +19,9 @@ Engine* createMainEngine(const char* json_file){
     return temp;
 }
 
-void destroyMainEngine(Engine* e){
+void deleteEngine(Engine* e){
     deleteFactDB(e->db);
-    deleteEngine(e->r_engine);
+    deleteRuleEngine(e->r_engine);
     freeRegistry(&e->action_registry);
     free(e);
 }
@@ -37,6 +37,6 @@ void registerTheAction(Engine* e, const char* name, Action_f f, void* ctx){
     }
 }
 
-void runMainEngine(Engine* e){
-    run(e->r_engine, e->db);
+void runEngine(Engine* e){
+    runRuleEngine(e->r_engine, e->db);
 }

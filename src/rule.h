@@ -29,10 +29,10 @@ typedef struct{
     Rule *rules; // a hash table of rules, where the key is the rule name and the value is the Rule struct
 } RuleEngine;
 
-void run(RuleEngine*, FactDB*);
+void runRuleEngine(RuleEngine*, FactDB*);
 Rule* createRule(Node*, char*, char*, void*);
-RuleEngine* createEngine();
+RuleEngine* createRuleEngine();
 void addRule(RuleEngine*, Rule*);
 void deleteRule(Rule*);
-void deleteEngine(RuleEngine*);
+void deleteRuleEngine(RuleEngine*);
 Rule* findRule(RuleEngine*, const char* name);

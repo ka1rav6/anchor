@@ -110,7 +110,7 @@ int main(void){
        The engine wires them automatically during build_ast. */
        
        /* Engine creation — callbacks are wired automatically */
-       Engine* e = createMainEngine("../src/test.json");
+       Engine* e = createEngine("../src/test.json");
     // --- rules that SHOULD fire ---
     registerTheAction(e, "SIMPLE_BOOL_FIRED",        cb_pass, "SIMPLE_BOOL_FIRED: isAdmin=true");
     registerTheAction(e, "AGE_OVER_18",              cb_pass, "AGE_OVER_18: age(25)>18");
@@ -155,7 +155,7 @@ int main(void){
     }
 
     printf("=== RUNNING ENGINE ===\n");
-    runMainEngine(e);
+    runEngine(e);
 
     printf("\n=== RESULTS ===\n");
     printf("  Expected to fire    : 24\n");
@@ -167,6 +167,6 @@ int main(void){
     else
         printf("  SOMETHING IS WRONG\n");
 
-    destroyMainEngine(e);
+    deleteEngine(e);
     return failed > 0 ? 1 : 0;
 }

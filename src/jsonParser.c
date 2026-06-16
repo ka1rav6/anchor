@@ -53,7 +53,7 @@ RuleEngine* build_ast(yyjson_doc* doc, FactDB* db, ActionEntry* g_registry){
     
     // 2. RULE ENGINE CREATION: 
     yyjson_val* rulesArr = yyjson_obj_get(root, "rules");
-    RuleEngine* engine = createEngine();
+    RuleEngine* engine = createRuleEngine();
 
     size_t idx = 0, max = 0; // assigned in the foreach loop below
     yyjson_val* rule;

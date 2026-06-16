@@ -1,7 +1,7 @@
 #include "rule.h"
 #include "uthash.h"
 
-void run(RuleEngine* e, FactDB* db){
+void runRuleEngine(RuleEngine* e, FactDB* db){
     printf("=== RUNNING RULE ENGINE ===\n");
     Rule *cr, *tmp;
     HASH_ITER(hh, e->rules, cr, tmp){
@@ -32,7 +32,15 @@ Rule* createRule(Node* n, char* action, char* name, void* ctx){
     return temp;
 }
 
-RuleEngine* createEngine(){
+void deleteRule(Rule* r){
+    deleteNode(r->condition);
+    free(r->action);
+    r->action = NULL;
+    free(r);
+    r = NULL;
+}
+
+RuleEngine* createRuleEngine(){
     RuleEngine* temp = (RuleEngine*)malloc(sizeof(RuleEngine));
     if (temp == NULL){
     printf("COULD NOT ALLOCATE SPACE FOR RULE\n");
@@ -42,15 +50,8 @@ RuleEngine* createEngine(){
     temp->rules = NULL;
     return temp;
 }
-void deleteRule(Rule* r){
-    deleteNode(r->condition);
-    free(r->action);
-    r->action = NULL;
-    free(r);
-    r = NULL;
-}
 
-void deleteEngine(RuleEngine* RE){
+void deleteRuleEngine(RuleEngine* RE){
     Rule* cr, *tmp;
     HASH_ITER(hh, RE->rules, cr, tmp){
         HASH_DEL(RE->rules, cr);

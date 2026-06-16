@@ -11,7 +11,7 @@ typedef struct Engine{
     ActionEntry* action_registry;
 } Engine;
 
-Engine* createMainEngine(const char*);
-void destroyMainEngine(Engine*);
+Engine* createEngine(const char*);
+void deleteEngine(Engine*);
 void registerTheAction(Engine*, const char* name, Action_f, void*);
-void runMainEngine(Engine*);
+void runEngine(Engine*);
