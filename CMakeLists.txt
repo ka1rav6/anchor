@@ -23,6 +23,8 @@ add_executable(engine
     src/engine.h
         src/ActionEntry.c
         src/ActionEntry.h
+    src/arena.c
+    src/arena.h
 )
 
 target_link_libraries(engine ${YYJSON_LIB})
