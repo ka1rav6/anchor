@@ -1,14 +1,11 @@
 cmake_minimum_required(VERSION 3.10)
 project(rule_engine C)
 
-find_library(YYJSON_LIB yyjson)
+find_library(YYJSON_LIB yyjson REQUIRED)
 
-# Debug flags for Valgrind
-set(CMAKE_C_FLAGS_DEBUG "-g -O0")
-
-add_executable(engine 
-    src/factdb.c 
-    src/factdb.h 
+add_executable(engine
+    src/factdb.c
+    src/factdb.h
     src/rule.c
     src/rule.h
     src/ConditionTree.h
@@ -21,15 +18,28 @@ add_executable(engine
     src/uthash.h
     src/engine.c
     src/engine.h
-        src/ActionEntry.c
-        src/ActionEntry.h
+    src/ActionEntry.c
+    src/ActionEntry.h
     src/arena.c
     src/arena.h
 )
 
-target_link_libraries(engine ${YYJSON_LIB})
+# Debug + gprof profiling
+target_compile_options(engine PRIVATE
+    -g
+    -O0
+    -pg
+)
 
-# Find Valgrind
+target_link_options(engine PRIVATE
+    -pg
+)
+
+target_link_libraries(engine PRIVATE
+    ${YYJSON_LIB}
+)
+
+# Valgrind target
 find_program(VALGRIND_EXECUTABLE valgrind)
 
 if(VALGRIND_EXECUTABLE)
