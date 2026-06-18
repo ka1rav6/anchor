@@ -1,5 +1,5 @@
-#include "factdb.h"
-#include "uthash.h"
+#include "../include/factdb.h"
+#include "../include/uthash.h"
 
 /*
  * gets the value of a numeric fact from the fact DB by searching for its name

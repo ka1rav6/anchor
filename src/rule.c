@@ -1,6 +1,6 @@
-#include "rule.h"
-#include "arena.h"
-#include "uthash.h"
+#include "../include/rule.h"
+#include "../include/arena.h"
+#include "../include/uthash.h"
 
 void runRuleEngine(RuleEngine* e, FactDB* db){
     printf("=== RUNNING RULE ENGINE ===\n");

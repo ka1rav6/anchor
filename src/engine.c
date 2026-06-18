@@ -1,4 +1,4 @@
-#include "engine.h"
+#include "../include/engine.h"
 
 Engine* createEngine(const char* json_file){
     Engine* temp = (Engine*)malloc(sizeof(Engine));

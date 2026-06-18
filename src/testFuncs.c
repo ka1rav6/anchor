@@ -1,5 +1,5 @@
-#include "uthash.h"
-#include "engine.h"
+#include "../include/uthash.h"
+#include "../include/engine.h"
 
 /* ── pass/fail counters ──────────────────────────────────────────────────── */
 

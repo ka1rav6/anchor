@@ -1,6 +1,6 @@
-#include "rule.h"
-#include "jsonParser.h"
-#include "semanticChecker.h"
+#include "../include/rule.h"
+#include "../include/jsonParser.h"
+#include "../include/semanticChecker.h"
 
 /*
  * Checks if file exists in file system 

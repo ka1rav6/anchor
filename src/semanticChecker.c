@@ -1,6 +1,6 @@
-#include "semanticChecker.h"
-#include "rule.h"
-#include "uthash.h"
+#include "../include/semanticChecker.h"
+#include "../include/rule.h"
+#include "../include/uthash.h"
 
 // checks if the operator is valid
 bool isOperator(const char* op){

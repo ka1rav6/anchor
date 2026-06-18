@@ -1,5 +1,5 @@
 // arena.c
-#include "arena.h"
+#include "../include/arena.h"
 
 /*
  * aligns the allocator memory to align up (3 bytes -> 8 bytes)
