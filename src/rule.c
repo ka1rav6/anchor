@@ -42,24 +42,19 @@ void deleteRule(Rule* r){
 
 RuleEngine* createRuleEngine(){
     RuleEngine* temp = (RuleEngine*)malloc(sizeof(RuleEngine));
-    if (temp == NULL){
-    printf("COULD NOT ALLOCATE SPACE FOR RULE\n");
-    exit(1);
+    if (!temp) { 
+        printf("COULD NOT ALLOCATE SPACE FOR RULE\n"); 
+        exit(EXIT_FAILURE); 
     }
     memset(temp, 0, sizeof(RuleEngine));
-    temp->rules = NULL;
+    temp->arena = createArena(RULE_ENGINE_ARENA_SIZE);
     return temp;
 }
 
 void deleteRuleEngine(RuleEngine* RE){
-    Rule* cr, *tmp;
-    HASH_ITER(hh, RE->rules, cr, tmp){
-        HASH_DEL(RE->rules, cr);
-        deleteNode(cr->condition);
-        free(cr->action);
-        free(cr);
-    }
+    destroyArena(RE->arena);
     free(RE);
+    RE = NULL;
 }
 
 void addRule(RuleEngine* e, Rule* r){
