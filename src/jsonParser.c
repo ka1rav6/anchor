@@ -2,12 +2,25 @@
 #include "jsonParser.h"
 #include "semanticChecker.h"
 
+/*
+ * Checks if file exists in file system 
+ * by manually opening it and checking
+ *
+ * @param : filename (string)
+ * @return : [bool] : true (file exists) && false (file does not exist)
+ */
 bool fileExists(const char* filename) {
     FILE* file = fopen(filename, "r");
     if (file) { fclose(file); return true; }
     return false;
 }
 
+/*
+ * Parses the json with the yyjson method
+ * 
+ * @param : filename (string)
+ * @return : a pointer to the yyjson doc
+ */
 yyjson_doc* parseJSON(const char * file){
     if (!fileExists(file)) {
        fprintf(stderr, "File not found: %s\n", file);
@@ -21,6 +34,15 @@ yyjson_doc* parseJSON(const char * file){
     return doc;
 }
 
+/*
+ * the main AST (rule engine is built here)
+ * parses the json doc and calls a function to build the fact database (hence passed as reference)
+ * and creates the rule and adds it to the engine
+ *
+ * @param 1 : the yyjson_doc ptr that stores all the json data to be parsed
+ * @param 2 : pointer to the fact DB that is changed in place.
+ * @return : the complete engine (AST)
+ */
 RuleEngine* build_ast(yyjson_doc* doc, FactDB* db, ActionEntry* g_registry){
     yyjson_val* root = yyjson_doc_get_root(doc);
     
@@ -67,6 +89,12 @@ RuleEngine* build_ast(yyjson_doc* doc, FactDB* db, ActionEntry* g_registry){
     return engine;
 }
 
+/*
+ * main node builder function that checks the type of the node to be built and calls the appropriate function to build it
+ * @param 1 : pointer to the fact DB (to passing on to functions that need it to check for fact existence and type etc..)
+ * @param 2 : pointer to the yyjson_val that represents the node to be built
+ * @return : pointer to the built node 
+ */
 Node* build_node(Arena* ar, FactDB* db, yyjson_val* v){
     if (yyjson_is_str(v))
         return build_fact(ar, db, v);
@@ -96,7 +124,12 @@ Node* build_node(Arena* ar, FactDB* db, yyjson_val* v){
     }
     return NULL;
 }
-
+/*
+ * builds the fact node by checking if the fact exists in the fact DB and storing its name in the node
+ * @param 1 : pointer to the fact DB (to check for fact existence)
+ * @param 2 : pointer to the yyjson_val that represents the fact (string)
+ * @return : pointer to the built fact node
+*/
 Node* build_fact(Arena* ar, FactDB* db, yyjson_val* v){
     Node* n = createNode(ar, NODE_FACT); // Pass ar
     n->data.Fact.factName = arena_strdup(ar, yyjson_get_str(v)); // Use arena_strdup
@@ -107,6 +140,14 @@ Node* build_fact(Arena* ar, FactDB* db, yyjson_val* v){
     return n;
 }
 
+/*
+ * builds the compare node by checking the operator and the operands and storing them in the node
+ * also checks for the validity of the comparison (e.g. comparing a bool fact with a number is not valid)
+ * @param 1 : pointer to the fact DB (to check for fact existence and type)
+ * @param 2 : operator (string)
+ * @param 3 : pointer to the yyjson_val that represents the array of operands (left and right)
+ * @return : pointer to the built compare node
+ */    
 Node* build_compare(Arena* ar, FactDB* db, const char* op, yyjson_val* arr){
     Node* n = createNode(ar, NODE_COMPARE); // Pass ar
     n->data.Compare.val = NAN;  
@@ -117,23 +158,35 @@ Node* build_compare(Arena* ar, FactDB* db, const char* op, yyjson_val* arr){
         fprintf(stderr, "Incorrect: Tried comparing bool with number : %s\n", n->data.Compare.factName);
         exit(EXIT_FAILURE);
     }
-    if (yyjson_is_int(right))  n->data.Compare.val = (double)yyjson_get_int(right);
-    if (yyjson_is_real(right)) n->data.Compare.val = (double)yyjson_get_real(right);
+    if (yyjson_is_int(right))  
+        n->data.Compare.val = (double)yyjson_get_int(right);
+    if (yyjson_is_real(right))
+         n->data.Compare.val = (double)yyjson_get_real(right);
 
     if (isnan(n->data.Compare.val)){
         fprintf(stderr, "Invalid comparison value (NAN) for fact '%s'\n", n->data.Compare.factName);
         exit(EXIT_FAILURE);
     }
-    if (strcmp(op, ">") == 0)       n->data.Compare.op = OP_GT;
-    else if (strcmp(op, "<") == 0)  n->data.Compare.op = OP_LT;
-    else if (strcmp(op, ">=") == 0) n->data.Compare.op = OP_GE;
-    else if (strcmp(op, "<=") == 0) n->data.Compare.op = OP_LE;
-    else if (strcmp(op, "==") == 0) n->data.Compare.op = OP_EQ;
-    else if (strcmp(op, "!=") == 0) n->data.Compare.op = OP_NE;
+    if (strcmp(op, ">") == 0)       
+        n->data.Compare.op = OP_GT;
+    else if (strcmp(op, "<") == 0)  
+        n->data.Compare.op = OP_LT;
+    else if (strcmp(op, ">=") == 0) 
+        n->data.Compare.op = OP_GE;
+    else if (strcmp(op, "<=") == 0)
+         n->data.Compare.op = OP_LE;
+    else if (strcmp(op, "==") == 0)
+         n->data.Compare.op = OP_EQ;
+    else if (strcmp(op, "!=") == 0)
+         n->data.Compare.op = OP_NE;
  
     return n;
 }
 
+/*
+ * builds the and/or nodes by iterating through the array of conditions and building the left and right nodes recursively
+ * USED TO BE TWO FUNCTIONS BUT THEY WERE VERY SIMILAR SO I COMBINED THEM INTO ONE FUNCTION AND PASSED THE TYPE OF OPERATOR AS A PARAMETER
+*/
 Node* build_and_or(Arena* ar, FactDB* db, yyjson_val* arr, Type t){
     const char* opName = (t == NODE_AND) ? "and" : "or";
     if (isEmptyOrUndersizedArray(arr, opName)){
@@ -157,6 +210,9 @@ Node* build_and_or(Arena* ar, FactDB* db, yyjson_val* arr, Type t){
     return left;
 }
 
+/*
+ * builds the not node 
+*/
 Node* build_not(Arena* ar, FactDB* db, yyjson_val* v){
     if (yyjson_is_arr(v) && isEmptyOrUndersizedArray(v, "not")){
         fprintf(stderr, "Empty array for 'not'\n");
@@ -167,9 +223,15 @@ Node* build_not(Arena* ar, FactDB* db, yyjson_val* v){
     return n;
 }
 
+/*
+ * builds the fact database by iterating through the "facts" object in the json and adding each fact to the database with its value and type
+ * @param 1 : pointer to the fact DB that is changed in place.
+ * @param 2 : pointer to the yyjson_val that represents the root of the json doc (to access the "facts" object)
+*/
 void build_factdb(FactDB* db, yyjson_val* root){
     yyjson_val* facts = yyjson_obj_get(root, "facts");
-    if (!facts || !yyjson_is_obj(facts)) return;
+    if (!facts || !yyjson_is_obj(facts)) 
+        return;
 
     yyjson_obj_iter iter;
     yyjson_obj_iter_init(facts, &iter);
@@ -178,8 +240,11 @@ void build_factdb(FactDB* db, yyjson_val* root){
     while ((key = yyjson_obj_iter_next(&iter))) {
         const char* name = yyjson_get_str(key);
         val = yyjson_obj_iter_get_val(key);
-        if (yyjson_is_bool(val))        setBoolFact(db, name, yyjson_get_bool(val));
-        else if (yyjson_is_int(val))    setNumFact(db, name, (double)yyjson_get_int(val));
-        else if (yyjson_is_real(val))   setNumFact(db, name, yyjson_get_real(val));
+        if (yyjson_is_bool(val)) 
+            setBoolFact(db, name, yyjson_get_bool(val));
+        else if (yyjson_is_int(val)) 
+            setNumFact(db, name, (double)yyjson_get_int(val));
+        else if (yyjson_is_real(val)) 
+            setNumFact(db, name, yyjson_get_real(val));
     }
 }
