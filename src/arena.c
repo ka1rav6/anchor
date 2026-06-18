@@ -1,6 +1,6 @@
 #include "arena.h"
 
-Arena* createArena(size_t size){
+Arena* create_arena(size_t size){
     Arena* ar = (Arena*) malloc(sizeof(Arena));
     ar->start = ask_memory(size);
     ar->used = 0;
