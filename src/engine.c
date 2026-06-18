@@ -3,14 +3,12 @@
 Engine* createEngine(const char* json_file){
     Engine* temp = (Engine*)malloc(sizeof(Engine));
     if (!temp){
-        fprintf(stderr, "The engine memory could not be allocated\n");
-        perror("");
+        FATAL("The engine memory could not be allocated\n");
         exit(EXIT_FAILURE);
     }
     memset(temp, 0, sizeof(Engine));
     if (json_file == NULL){
-        fprintf(stderr, "ERROR: the engine cannot be created with a NULL json file\n");
-        perror("");
+        FATAL("ERROR: the engine cannot be created with a NULL json file\n");
         exit(EXIT_FAILURE);
     }
     temp->json_file = json_file;

@@ -13,8 +13,7 @@ char* ask_memory(size_t size) {
     void* ptr = mmap(NULL, size, PROT_READ | PROT_WRITE,
                       MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     if (ptr == MAP_FAILED) {
-        fprintf(stderr, "Arena memory mapping failed\n");
-        exit(EXIT_FAILURE);
+        FATAL("Arena memory mapping failed\n");
     }
     return (char*)ptr;
 }
@@ -23,8 +22,7 @@ char* ask_memory(size_t size) {
 Arena* createArena(size_t size) {
     Arena* ar = (Arena*)malloc(sizeof(Arena));
     if (!ar) {
-        fprintf(stderr, "Could not allocate Arena struct\n");
-        exit(EXIT_FAILURE);
+        FATAL("Could not allocate Arena struct\n");
     }
     ar->start = ask_memory(size);
     ar->used = 0;
@@ -36,8 +34,7 @@ void* arena_alloc(Arena* ar, size_t size) {
     if (!ar || size == 0) return NULL;
     size_t aligned = align_up(ar->used, ARENA_ALIGNMENT);
     if (size > ar->size - aligned) {
-        fprintf(stderr, "Arena out of memory: %zu bytes requested\n", size);
-        return NULL;
+        FATAL("Arena out of memory: %zu bytes requested\n", size);
     }
     void* loc = ar->start + aligned;
     ar->used = aligned + size;
@@ -62,6 +59,5 @@ void arena_reset(Arena* ar) {
 void destroyArena(Arena* ar) {
     if (!ar) return;
     if (munmap(ar->start, ar->size) == -1)
-        fprintf(stderr, "MUNMAP FAILED!\n");
-    free(ar);
+        FATAL("MUNMAP FAILED!\n");
 }

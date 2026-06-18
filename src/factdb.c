@@ -57,8 +57,7 @@ bool evaluate(FactDB* db, Node* n){
                 case OP_NE:
                     return lhs != rhs;
                 default:
-                    fprintf(stderr, "UNKNOWN COMPARE OP\n");
-                    return false;
+                    FATAL("UNKNOWN COMPARE OP\n");
             }
         }
     }
