@@ -8,6 +8,7 @@
 // my own arena style memory allocator used ONLY in rule allocation and AST
 // As AST is sequential and is freed and created once.
 
+#define ARENA_ALIGNMENT 8
 
 typedef struct{
     size_t size;
@@ -15,9 +16,10 @@ typedef struct{
     char* start;
 }Arena;
 
+static inline size_t align_up(size_t n, size_t alignment);
 
 char* ask_memory(size_t);
 Arena* create_arena(size_t);
 
-void* arena_alloc(Arena*, size_t, void* data);
-void arena_free(Arena*);
+void* arena_alloc(Arena*, size_t);
+void destroy_arena(Arena*);
