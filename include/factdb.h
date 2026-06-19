@@ -36,6 +36,7 @@ typedef enum{
 typedef struct{
     BoolFact* boolFacts;
     u64 bits[BITMASK_WORDS];
+    int bitCount;
     NumFact* numFacts;
 }FactDB;
 

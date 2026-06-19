@@ -15,6 +15,21 @@ double getNumFact(FactDB* db, const char* name){
     }
     return f->val;
 }
+
+// sets the bit at "index" to 1
+void setBit(FactDB* db, int index){
+    db->bits[index/BITS_PER_WORD] |= (1ULL << (index % BITS_PER_WORD));
+}
+// sets the bit at "index" to 0
+void clearBit(FactDB* db, int idx){
+    db->bits[idx / BITS_PER_WORD] &= ~(1ULL << (idx % BITS_PER_WORD));
+}
+// gives the boolean value of the bit at the particular pos
+bool testBit(FactDB* db, int idx){
+    return (db->bits[idx / BITS_PER_WORD] >> (idx % BITS_PER_WORD)) & 1ULL;
+}
+
+
 // Similar to getNumFact but for boolean facts
 bool getBoolFact(FactDB* db, const char* name){
     BoolFact* f;
@@ -22,7 +37,7 @@ bool getBoolFact(FactDB* db, const char* name){
     if (!f){
         return false;
     }
-    return f->val;
+    return testBit(db, f->bitIndex);
 }
 /*
  * evaluates a node in the AST by recursively evaluating its children and applying the appropriate logic
@@ -63,7 +78,6 @@ bool evaluate(FactDB* db, Node* n){
     }
     return false;
 }
-
 // constructor for factDB 
 FactDB* createFactDB(){
     FactDB* temp = (FactDB*)malloc(sizeof(FactDB));
@@ -107,16 +121,19 @@ void setBoolFact(FactDB* db, const char* name, bool val){
     BoolFact *f;
     HASH_FIND_STR(db->boolFacts, name, f);
     if (f){
-        f->val = val; // updating the value if the name is found
+        val ? setBit(db, f->bitIndex) : clearBit(db, f->bitIndex);
         return;
+    }
+    if (db->bitCount >= MAX_FACTS){
+        FATAL("Bool fact bitmask exhausted, increase MAX_FACTS\n");
     }
     f = (BoolFact*) malloc(sizeof(BoolFact));
     memset(f, 0, sizeof(BoolFact));
     strcpy(f->name, name);
-    f->val = val;
+    f->bitIndex = db->bitCount++;
+    val ? setBit(db, f->bitIndex) : clearBit(db, f->bitIndex);
     HASH_ADD_STR(db->boolFacts, name, f);
 }
-
 // Similar to setBoolFact but for numeric facts
 void setNumFact(FactDB* db, const char* name, double val){
     NumFact* f;
