@@ -60,4 +60,5 @@ void destroyArena(Arena* ar) {
     if (!ar) return;
     if (munmap(ar->start, ar->size) == -1)
         FATAL("MUNMAP FAILED!\n");
+    free(ar);
 }
