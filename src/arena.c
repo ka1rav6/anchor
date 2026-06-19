@@ -1,9 +1,7 @@
 // arena.c
 #include "../include/arena.h"
 
-/*
- * aligns the allocator memory to align up (3 bytes -> 8 bytes)
- */
+// aligns the allocator memory to align up (3 bytes -> 8 bytes)
 static inline size_t align_up(size_t n, size_t alignment) {
     return (n + alignment - 1) & ~(alignment - 1);
 }
@@ -51,7 +49,7 @@ char* arena_strdup(Arena* ar, const char* s) {
 }
 
 // resets the whole arena so it is basically cleared and can be used again
-void arena_reset(Arena* ar) {
+void arena_reset(Arena* ar) { // not called yet but can be used in the future
     if (ar) ar->used = 0;
 }
 

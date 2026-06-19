@@ -11,7 +11,7 @@ static bool fileExists(const char* filename) {
 }
 
 // Parses the json with the yyjson method
-static yyjson_doc* parseJSON(const char * file){
+yyjson_doc* parseJSON(const char * file){
     if (!fileExists(file)) {
        FATAL("File not found: %s\n", file);
     }
@@ -25,7 +25,7 @@ static yyjson_doc* parseJSON(const char * file){
 // the main AST (rule engine is built here) parses the json doc and 
 // calls a function to build the fact database (hence passed as reference) 
 // and creates the rule and adds it to the engine
-static RuleEngine* build_ast(yyjson_doc* doc, FactDB* db, ActionEntry* g_registry){
+RuleEngine* build_ast(yyjson_doc* doc, FactDB* db, ActionEntry* g_registry){
     yyjson_val* root = yyjson_doc_get_root(doc);
     
     // Keeps FactDB completely on the standard heap

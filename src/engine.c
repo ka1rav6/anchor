@@ -1,15 +1,16 @@
 #include "../include/engine.h"
 
+// Engine constructor. To be called by the user.
 Engine* createEngine(const char* json_file){
     Engine* temp = (Engine*)malloc(sizeof(Engine));
+
     if (!temp){
         FATAL("The engine memory could not be allocated\n");
-        exit(EXIT_FAILURE);
     }
     memset(temp, 0, sizeof(Engine));
+
     if (json_file == NULL){
         FATAL("ERROR: the engine cannot be created with a NULL json file\n");
-        exit(EXIT_FAILURE);
     }
     temp->json_file = json_file;
     temp->db = createFactDB();
@@ -17,13 +18,14 @@ Engine* createEngine(const char* json_file){
     return temp;
 }
 
+// engine destructor. the arena is also deleted through the rule engine
 void deleteEngine(Engine* e){
     deleteFactDB(e->db);
     deleteRuleEngine(e->r_engine);
     freeRegistry(&e->action_registry);
     free(e);
 }
-
+// to register the action in the action registry
 void registerTheAction(Engine* e, const char* name, Action_f f, void* ctx){
     registerAction(&e->action_registry, name, f, ctx);
     Rule *r, *tmp;
@@ -34,7 +36,7 @@ void registerTheAction(Engine* e, const char* name, Action_f f, void* ctx){
         }
     }
 }
-
+// just internally runs the rule engine
 void runEngine(Engine* e){
     runRuleEngine(e->r_engine, e->db);
 }

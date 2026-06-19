@@ -11,3 +11,5 @@ Node* createNode(Arena* ar, Type t){
     temp->type = t;
     return temp;
 }
+
+// destructor is no longer needed as cleared along with the arena
