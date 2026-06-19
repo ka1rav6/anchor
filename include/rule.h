@@ -5,6 +5,7 @@
 
 #include "arena.h"
 #include "factdb.h"
+#include "bytecode.h"
 
 #define MAX_ACTION_NAME 64
 #define MAX_RULE_NAME 64
@@ -13,9 +14,9 @@
 
 typedef void (*Action_f)(FactDB* db, void* ctx);
 
-
 typedef struct {
     Node* condition;
+    Bytecode* bc;
     char *action;
     char ruleName[MAX_RULE_NAME];
     Action_f func;
