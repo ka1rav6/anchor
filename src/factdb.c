@@ -1,12 +1,7 @@
 #include "../include/factdb.h"
 #include "../include/uthash.h"
 
-/*
- * gets the value of a numeric fact from the fact DB by searching for its name
- * @param 1 : pointer to the fact DB (to search for the fact)
- * @param 2 : name of the fact (string)
- * @return : value of the fact (double) or NOT_FOUND (NAN) if the fact does not exist
-*/
+// gets the value of a numeric fact from the fact DB by searching for its name
 double getNumFact(FactDB* db, const char* name){
     NumFact* f;
     HASH_FIND_STR(db->numFacts, name, f);
@@ -24,13 +19,11 @@ bool getBoolFact(FactDB* db, const char* name){
     }
     return f->val;
 }
-/*
- * evaluates a node in the AST by recursively evaluating its children and applying the appropriate logic
- * @param 1 : pointer to the fact DB (to access fact values)
- * @param 2 : pointer to the node to be evaluated
- * @return : result of the evaluation (boolean)
- */
+
+// evaluates a node in the AST by recursively evaluating its children and applying the appropriate logic
+// now not used ever since bytecode has started being used. This was the initial evaluating function
 bool evaluate(FactDB* db, Node* n){
+
     switch(n->type){
         case NODE_AND:
             return evaluate(db, n->data.op.left) && evaluate(db, n->data.op.right);
@@ -43,6 +36,8 @@ bool evaluate(FactDB* db, Node* n){
         case NODE_COMPARE:{
             double lhs = getNumFact(db, n->data.Compare.factName);
             double rhs = n->data.Compare.val;
+
+            // compare the operator and return whether the comparison is correct
             switch(n->data.Compare.op){
                 case OP_LT:
                     return lhs < rhs;
@@ -97,12 +92,7 @@ void deleteFactDB(FactDB* db){
     db = NULL;// to prevent dangling ptrs
 }
 
-/*
- * sets the value of a fact in the fact DB by searching for its name and UPDATING THE VALUE IF IT EXISTS, or adding a new fact if it does not exist
- * @param 1 : pointer to the fact DB (to search for the fact and update/add it)
- * @param 2 : name of the fact (string)
- * @param 3 : value of the fact (bool or double) 
-*/
+// sets the value of a fact in the fact DB by searching for its name and UPDATING THE VALUE IF IT EXISTS, or adding a new fact if it does not exist
 void setBoolFact(FactDB* db, const char* name, bool val){
     BoolFact *f;
     HASH_FIND_STR(db->boolFacts, name, f);

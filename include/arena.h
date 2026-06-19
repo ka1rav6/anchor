@@ -1,4 +1,3 @@
-// arena.h
 #pragma once
 #include "common.h"
 #include <string.h>
