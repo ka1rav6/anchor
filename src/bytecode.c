@@ -12,81 +12,61 @@ static void emit(Arena* ar, Bytecode* bc, Instr i){
     if (bc->count >= bc->capacity){
         Instr* old = bc->code;
         int newCap = bc->capacity * 2;
-        Instr* newGrown = (Instr*)arena_alloc(ar, sizeof(Instr) * newCap);
-        memcpy(newGrown, old, sizeof(Instr) * bc->count);
-        bc->code = newGrown;
+        Instr* grown = (Instr*)arena_alloc(ar, sizeof(Instr) * newCap);
+        memcpy(grown, old, sizeof(Instr) * bc->count);
+        bc->code = grown;
         bc->capacity = newCap;
     }
     bc->code[bc->count++] = i;
 }
 
 static void compileWalk(Arena* ar, Bytecode* bc, Node* n){
-    switch(n->type){
-        case NODE_AND:{
+    switch (n->type){
+        case NODE_AND:
             compileWalk(ar, bc, n->data.op.left);
             compileWalk(ar, bc, n->data.op.right);
-            Instr i;
-            i.op = OP_AND;
-            emit(ar, bc, i);
+            emit(ar, bc, (Instr){ .op = OP_AND });
             break;
-        }
-        case NODE_OR:{
+        case NODE_OR:
             compileWalk(ar, bc, n->data.op.left);
             compileWalk(ar, bc, n->data.op.right);
-            Instr i;
-            i.op = OP_OR;
-            emit(ar, bc, i);
+            emit(ar, bc, (Instr){ .op = OP_OR });
             break;
-        }
-        case NODE_NOT:{
+        case NODE_NOT:
             compileWalk(ar, bc, n->data.unary.child);
-            Instr i;
-            i.op = OP_NOT;
-            emit(ar, bc, i);
-        }
-        case NODE_FACT:{
-            Instr i;
-            i.op = OP_PUSH_FACT;
-            i.factName = n->data.Fact.factName;
-            emit(ar, bc, i);
+            emit(ar, bc, (Instr){ .op = OP_NOT });
             break;
-        }
-        case NODE_COMPARE:{
-            Instr i;
-            i.op = OP_PUSH_CMP;
-            i.factName = n->data.Compare.factName;
-            i.cmp = n->data.Compare.op;
-            i.val = n->data.Compare.val;
-            emit(ar, bc, i);
-        }
+        case NODE_FACT:
+            emit(ar, bc, (Instr){ .op = OP_PUSH_FACT, .factName = n->data.Fact.factName });
+            break;
+        case NODE_COMPARE:
+            emit(ar, bc, (Instr){
+                .op = OP_PUSH_CMP,
+                .factName = n->data.Compare.factName,
+                .cmp = n->data.Compare.op,
+                .val = n->data.Compare.val
+            });
+            break;
     }
 }
-
 
 Bytecode* compileNode(Arena* ar, Node* n){
     Bytecode* bc = createBytecode(ar);
     compileWalk(ar, bc, n);
-    Instr i;
-    i.op = OP_HALT;
-    emit(ar, bc, i);
+    emit(ar, bc, (Instr){ .op = OP_HALT });
     return bc;
 }
+
 static bool runCompare(FactDB* db, Instr* i){
     double lhs = getNumFact(db, i->factName);
     double rhs = i->val;
     switch (i->cmp){
-        case OP_LT:
-            return lhs < rhs;
-        case OP_GT:
-            return lhs > rhs;
-        case OP_LE:
-            return lhs <= rhs;
-        case OP_GE:
-            return lhs >= rhs;
-        case OP_EQ:
-            return lhs == rhs;
-        case OP_NE:
-            return lhs != rhs;
+        case OP_LT: return lhs < rhs;
+        case OP_GT: return lhs > rhs;
+        case OP_LE: return lhs <= rhs;
+        case OP_GE: return lhs >= rhs;
+        case OP_EQ: return lhs == rhs;
+        case OP_NE: return lhs != rhs;
     }
     return false;
 }

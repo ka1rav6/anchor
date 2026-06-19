@@ -14,6 +14,7 @@
 
 typedef void (*Action_f)(FactDB* db, void* ctx);
 
+
 typedef struct {
     Node* condition;
     Bytecode* bc;
@@ -35,4 +36,3 @@ Rule* createRule(RuleEngine*, Node*, char*, char*, void*);
 RuleEngine* createRuleEngine();
 void addRule(RuleEngine*, Rule*);
 void deleteRuleEngine(RuleEngine*);
-Rule* findRule(RuleEngine*, const char* name);

@@ -13,6 +13,7 @@ add_executable(engine
     src/engine.c
     src/ActionEntry.c
     src/arena.c
+    src/bytecode.c
     include/uthash.h
     include/ConditionTree.h
     include/factdb.h
@@ -24,6 +25,7 @@ add_executable(engine
     include/arena.h
     include/common.h
     include/common.h.gch
+    include/bytecode.h
 )
 
 # Debug + gprof profiling
