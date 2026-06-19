@@ -70,7 +70,7 @@ void deleteRuleEngine(RuleEngine* RE)
     free(RE);
 }
 
-// ------------ FUNCTIONS FOR ADDING/ FINDING stuff in the hash tables
+// ------------ FUNCTIONS FOR ADDING/ FINDING stuff in the hash tables --------------
 
 
 // adds the rule to the rule engine
