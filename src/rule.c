@@ -3,12 +3,19 @@
 #include "../include/uthash.h"
 #include "../include/bytecode.h"
 
-void runRuleEngine(RuleEngine* e, FactDB* db){
+
+// ----------- ACTUAL FUNCTIONS -------------//
+
+
+// runs the rule engine and triggers the required action
+void runRuleEngine(RuleEngine* e, FactDB* db)
+{
     printf("=== RUNNING RULE ENGINE ===\n");
     Rule *cr, *tmp;
     HASH_ITER(hh, e->rules, cr, tmp){
-        if (runBytecode(db, cr->bc)){
-            if (cr->func){
+        // runBytecode does the whole eval process
+        if (runBytecode(db, cr->bc)){ // returns true only if OP_HALT instruction is present at the end.
+            if (cr->func){ // if the current rule has a function assigned to it
                 cr->func(db, cr->ctx);
                 printf("Action Triggered: %s\n", cr->action);
             }
@@ -20,7 +27,9 @@ void runRuleEngine(RuleEngine* e, FactDB* db){
     }
 }
 
-Rule* createRule(RuleEngine* e, Node* n, char* action, char* name, void* ctx){
+// simple rule constructor
+Rule* createRule(RuleEngine* e, Node* n, char* action, char* name, void* ctx)
+{
     Rule* temp = (Rule*)arena_alloc(e->arena, sizeof(Rule));
     temp->condition = n;
     temp->bc = compileNode(e->arena, n);
@@ -30,11 +39,15 @@ Rule* createRule(RuleEngine* e, Node* n, char* action, char* name, void* ctx){
     return temp;
 }
 
-void deleteRule(Rule* r){
-    // Intentionally empty. Managed via RuleEngine teardown.
+// USED to be a rule destructor
+void deleteRule(Rule* r)
+{
+    // Intentionally empty. Managed via RuleEngine teardown (destroy arena function).
 }
 
-RuleEngine* createRuleEngine(){
+// simple rule engine constructor
+RuleEngine* createRuleEngine()
+{
     RuleEngine* temp = (RuleEngine*)malloc(sizeof(RuleEngine));
     if (!temp) { 
         printf("COULD NOT ALLOCATE SPACE FOR RULE\n"); 
@@ -45,23 +58,33 @@ RuleEngine* createRuleEngine(){
     return temp;
 }
 
-void deleteRuleEngine(RuleEngine* RE){
+// simple rule engine destructor : arena is also destroyed here
+void deleteRuleEngine(RuleEngine* RE)
+{
     if (!RE) return;
     Rule *current_rule, *tmp;
-    HASH_ITER(hh, RE->rules, current_rule, tmp) {
+    HASH_ITER(hh, RE->rules, current_rule, tmp) { // iterates through all rules
         HASH_DEL(RE->rules, current_rule);
     }
     destroyArena(RE->arena);
     free(RE);
 }
 
-void addRule(RuleEngine* e, Rule* r){
+// ------------ FUNCTIONS FOR ADDING/ FINDING stuff in the hash tables
+
+
+// adds the rule to the rule engine
+void addRule(RuleEngine* e, Rule* r)
+{
     HASH_ADD_STR(e->rules, ruleName, r);
 }
 
-Rule* findRule(RuleEngine* e, const char * name){
+// searches for and finds the rule in the search engine
+Rule* findRule(RuleEngine* e, const char * name)
+{
     Rule* r;
     HASH_FIND_STR(e->rules, name, r);
-    if (r) return r;
+    if (r) 
+        return r;
     return NULL;
 }

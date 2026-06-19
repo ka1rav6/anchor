@@ -22,31 +22,45 @@ static void emit(Arena* ar, Bytecode* bc, Instr i){
 
 static void compileWalk(Arena* ar, Bytecode* bc, Node* n){
     switch (n->type){
-        case NODE_AND:
+        case NODE_AND:{
             compileWalk(ar, bc, n->data.op.left);
             compileWalk(ar, bc, n->data.op.right);
-            emit(ar, bc, (Instr){ .op = OP_AND });
+            Instr i;
+            i.op = OP_AND; 
+            emit(ar, bc, i);
             break;
-        case NODE_OR:
+            }
+        case NODE_OR:{
             compileWalk(ar, bc, n->data.op.left);
             compileWalk(ar, bc, n->data.op.right);
-            emit(ar, bc, (Instr){ .op = OP_OR });
+            Instr i;
+            i.op = OP_OR; 
+            emit(ar, bc, i);
             break;
-        case NODE_NOT:
+            }
+        case NODE_NOT:{
             compileWalk(ar, bc, n->data.unary.child);
-            emit(ar, bc, (Instr){ .op = OP_NOT });
+            Instr i;
+            i.op = OP_NOT; 
+            emit(ar, bc, i);
             break;
-        case NODE_FACT:
-            emit(ar, bc, (Instr){ .op = OP_PUSH_FACT, .factName = n->data.Fact.factName });
+            }
+        case NODE_FACT:{
+            Instr i;
+            i.op = OP_PUSH_FACT;
+            i.factName = n->data.Fact.factName; 
+            emit(ar, bc, i);
             break;
-        case NODE_COMPARE:
-            emit(ar, bc, (Instr){
-                .op = OP_PUSH_CMP,
-                .factName = n->data.Compare.factName,
-                .cmp = n->data.Compare.op,
-                .val = n->data.Compare.val
-            });
+            }
+        case NODE_COMPARE:{
+            Instr i;
+            i.op = OP_PUSH_CMP;
+            i.factName = n->data.Compare.factName;
+            i.cmp = n->data.Compare.op;
+            i.val = n->data.Compare.val;
+            emit(ar, bc, i);
             break;
+            }
     }
 }
 
