@@ -154,6 +154,20 @@ See the bottom of this file for what's planned next.
 - [ ] Additional operators: `BETWEEN`, `IN`
 - [ ] Friendlier integration API for C/C++ host projects
 
+## How to install and use
+
+Linux/ MacOS:
+```bash
+    git clone git@github.com:ka1rav6/vela.git
+    cd vela
+    mkdir build && cd build
+    cmake .. && make
+```
+Please make sure you have `yyjson` installed or else install it from here: https://github.com/ibireme/yyjson
+
+
+Run the `engine` executable file created in the build directory. For sample usage please checkout `testFuncs.c` and `test.json`
+
 ## License
 
 Apache 2.0 — see `LICENSE`.
