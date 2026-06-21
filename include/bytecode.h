@@ -14,10 +14,10 @@ typedef enum {
 } OpCode;
 
 typedef struct {
-    OpCode op;
     char* factName;
-    CompareOp cmp;
     double val;
+    OpCode op;
+    CompareOp cmp;
 } Instr;
 
 typedef struct {
