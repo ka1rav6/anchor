@@ -15,7 +15,7 @@ struct Arena {
     size_t size;
     size_t used;
     char*  start;
-    pthread_mutex_t lock;   /* protects 'used' (and the bump pointer) across threads */
+    pthread_mutex_t lock;   // protects 'used' (and the bump pointer) across threads 
 };
 
 /* Internal-only helper, not part of the public API */
