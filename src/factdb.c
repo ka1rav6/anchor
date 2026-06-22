@@ -10,6 +10,7 @@ double getNumFact(FactDB* db, const char* name){
     pthread_rwlock_unlock(&db->lock);
     return result;
 }
+
 // Similar to getNumFact but for boolean facts
 bool getBoolFact(FactDB* db, const char* name){
     pthread_rwlock_rdlock(&db->lock);
@@ -59,7 +60,7 @@ bool evaluate(FactDB* db, Node* n){
     return false;
 }
 
-// constructor for factDB 
+// constructor for factDB
 FactDB* createFactDB(){
     FactDB* temp = (FactDB*)malloc(sizeof(FactDB));
     if (temp == NULL){
@@ -88,7 +89,7 @@ void deleteFactDB(FactDB* db){
         free(currBool);
     }
     currBool = NULL;
-    tempBool = NULL; // to prevent dangling ptrs
+    tempBool = NULL;
     currNum = NULL;
     tempNum = NULL;
     pthread_rwlock_destroy(&db->lock);
@@ -140,7 +141,7 @@ void setNumFact(FactDB* db, const char* name, double val){
     HASH_ADD_STR(db->numFacts, name, f);
     pthread_rwlock_unlock(&db->lock);
 }
-// checks if the db has the particular bool fact
+
 bool factdb_has_bool(FactDB* db, const char* name){
     pthread_rwlock_rdlock(&db->lock);
     BoolFact* f;
@@ -150,7 +151,6 @@ bool factdb_has_bool(FactDB* db, const char* name){
     return found;
 }
 
-// checks if the db has the particular num fact
 bool factdb_has_num(FactDB* db, const char* name){
     pthread_rwlock_rdlock(&db->lock);
     NumFact* f;
@@ -158,4 +158,20 @@ bool factdb_has_num(FactDB* db, const char* name){
     bool found = (bool)f;
     pthread_rwlock_unlock(&db->lock);
     return found;
+}
+
+// Debug/inspection helper: prints all facts. Read-locked for the whole
+void printFactDB(FactDB* db){
+    pthread_rwlock_rdlock(&db->lock);
+    printf("=== FACT DB ===\n");
+    printf("[BOOL FACTS]\n");
+    BoolFact* bf, *btmp;
+    HASH_ITER(hh, db->boolFacts, bf, btmp)
+        printf("  %s = %s\n", bf->name, bf->val ? "true" : "false");
+    printf("[NUM FACTS]\n");
+    NumFact* nf, *ntmp;
+    HASH_ITER(hh, db->numFacts, nf, ntmp)
+        printf("  %s = %.2f\n", nf->name, nf->val);
+    printf("================\n\n");
+    pthread_rwlock_unlock(&db->lock);
 }

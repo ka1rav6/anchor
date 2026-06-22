@@ -14,10 +14,12 @@ typedef enum{
 /* Opaque handle. Internals (hash tables, locking) are hidden in factdb_internal.h. */
 typedef struct FactDB FactDB;
 
-double  getNumFact  (FactDB*, const char*);
-bool    getBoolFact (FactDB*, const char*);
-bool    evaluate    (FactDB*, Node*);
+double getNumFact(FactDB*, const char*);
+bool getBoolFact(FactDB*, const char*);
+bool evaluate(FactDB*, Node*);
 FactDB* createFactDB(void);
-void    deleteFactDB(FactDB*);
-void    setBoolFact (FactDB*, const char*, bool);
-void    setNumFact  (FactDB* db, const char*, double);
+void deleteFactDB(FactDB*);
+void setBoolFact(FactDB*, const char*, bool);
+void setNumFact(FactDB* db, const char*, double);
+
+void printFactDB(FactDB* db);
