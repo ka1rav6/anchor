@@ -29,3 +29,11 @@ Rule* findRule(RuleEngine*, const char* name);
 /* Lets a caller bind/rebind the action function+ctx for every rule whose
  * action name matches, without exposing the Rule struct's fields directly. */
 void rule_engine_bind_action(RuleEngine* e, const char* action_name, Action_f f, void* ctx);
+
+/* function to access ruleEngine internals*/
+const char* rule_name(const Rule*);
+const char* rule_action(const Rule*);
+Node* rule_condition(const Rule*);
+
+typedef void (*RuleVisitor)(Rule* r, void* user_ctx);
+void rule_engine_for_each(RuleEngine* e, RuleVisitor cb, void* user_ctx);
