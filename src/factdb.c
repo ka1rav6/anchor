@@ -1,23 +1,23 @@
-#include "../include/factdb.h"
-#include "../include/uthash.h"
+#include "../include/factdb_internal.h"
 
-// gets the value of a numeric fact from the fact DB by searching for its name
+// gets the value of a numeric fact from the fact DB by searching for its name.
+// Thread-safe: read-locked, since multiple readers can look up facts concurrently.
 double getNumFact(FactDB* db, const char* name){
+    pthread_rwlock_rdlock(&db->lock);
     NumFact* f;
     HASH_FIND_STR(db->numFacts, name, f);
-    if (!f){
-        return NOT_FOUND;
-    }
-    return f->val;
+    double result = f ? f->val : NOT_FOUND;
+    pthread_rwlock_unlock(&db->lock);
+    return result;
 }
 // Similar to getNumFact but for boolean facts
 bool getBoolFact(FactDB* db, const char* name){
+    pthread_rwlock_rdlock(&db->lock);
     BoolFact* f;
     HASH_FIND_STR(db->boolFacts, name, f);
-    if (!f){
-        return false;
-    }
-    return f->val;
+    bool result = f ? f->val : false;
+    pthread_rwlock_unlock(&db->lock);
+    return result;
 }
 
 // evaluates a node in the AST by recursively evaluating its children and applying the appropriate logic
@@ -69,6 +69,9 @@ FactDB* createFactDB(){
     memset(temp, 0, sizeof(FactDB));
     temp->boolFacts = NULL;
     temp->numFacts = NULL;
+    if (pthread_rwlock_init(&temp->lock, NULL) != 0){
+        FATAL("Could not initialize FactDB lock\n");
+    }
     return temp;
 }
 
@@ -88,42 +91,71 @@ void deleteFactDB(FactDB* db){
     tempBool = NULL; // to prevent dangling ptrs
     currNum = NULL;
     tempNum = NULL;
+    pthread_rwlock_destroy(&db->lock);
     free(db);
-    db = NULL;// to prevent dangling ptrs
 }
 
-// sets the value of a fact in the fact DB by searching for its name and UPDATING THE VALUE IF IT EXISTS, or adding a new fact if it does not exist
+// sets the value of a fact in the fact DB by searching for its name and UPDATING THE VALUE IF IT EXISTS,
+// or adding a new fact if it does not exist.
+// Thread-safe: write-locked, exclusive against both readers and other writers.
 void setBoolFact(FactDB* db, const char* name, bool val){
+    pthread_rwlock_wrlock(&db->lock);
     BoolFact *f;
     HASH_FIND_STR(db->boolFacts, name, f);
     if (f){
-        f->val = val; // updating the value if the name is found
+        f->val = val;
+        pthread_rwlock_unlock(&db->lock);
         return;
     }
     f = (BoolFact*) malloc(sizeof(BoolFact));
     memset(f, 0, sizeof(BoolFact));
     if (strlen(name) > MAX_NAME){
+        pthread_rwlock_unlock(&db->lock);
         FATAL("Cannot have a fact name that exceeds the cound of %d letters. The action : %s does.", MAX_NAME, name);
     }
     strcpy(f->name, name);
     f->val = val;
     HASH_ADD_STR(db->boolFacts, name, f);
+    pthread_rwlock_unlock(&db->lock);
 }
 
 // Similar to setBoolFact but for numeric facts
 void setNumFact(FactDB* db, const char* name, double val){
+    pthread_rwlock_wrlock(&db->lock);
     NumFact* f;
     HASH_FIND_STR(db->numFacts, name, f);
     if (f){
-        f->val = val; // updating the value if the name is found
+        f->val = val;
+        pthread_rwlock_unlock(&db->lock);
         return;
     }
     f = (NumFact*)malloc(sizeof(NumFact));
     memset(f, 0, sizeof(NumFact));
     if (strlen(name) > MAX_NAME){
+        pthread_rwlock_unlock(&db->lock);
         FATAL("Cannot have a fact name that exceeds the cound of %d letters. The action : %s does.", MAX_NAME, name);
     }
     strcpy(f->name, name);
     f->val = val;
     HASH_ADD_STR(db->numFacts, name, f);
+    pthread_rwlock_unlock(&db->lock);
+}
+// checks if the db has the particular bool fact
+bool factdb_has_bool(FactDB* db, const char* name){
+    pthread_rwlock_rdlock(&db->lock);
+    BoolFact* f;
+    HASH_FIND_STR(db->boolFacts, name, f);
+    bool found = (bool)f;
+    pthread_rwlock_unlock(&db->lock);
+    return found;
+}
+
+// checks if the db has the particular num fact
+bool factdb_has_num(FactDB* db, const char* name){
+    pthread_rwlock_rdlock(&db->lock);
+    NumFact* f;
+    HASH_FIND_STR(db->numFacts, name, f);
+    bool found = (bool)f;
+    pthread_rwlock_unlock(&db->lock);
+    return found;
 }
