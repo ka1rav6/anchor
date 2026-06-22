@@ -3,6 +3,10 @@ project(rule_engine C)
 
 find_library(YYJSON_LIB yyjson REQUIRED)
 
+# Needed for pthread_mutex_t / pthread_rwlock_t used throughout the
+# *_internal.h headers (Arena, FactDB, RuleEngine, Engine).
+find_package(Threads REQUIRED)
+
 add_executable(engine
     src/factdb.c
     src/rule.c
@@ -17,6 +21,7 @@ add_executable(engine
     include/uthash.h
     include/ConditionTree.h
     include/factdb.h
+    include/factdb_internal.h
     include/engine.h
     include/engine_internal.h
     include/rule.h
@@ -45,6 +50,7 @@ target_link_options(engine PRIVATE
 
 target_link_libraries(engine PRIVATE
     ${YYJSON_LIB}
+    Threads::Threads
 )
 
 # Valgrind target
