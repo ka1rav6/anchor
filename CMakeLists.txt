@@ -23,6 +23,7 @@ add_executable(engine
     include/ActionEntry.h
     include/jsonParser.h
     include/arena.h
+    include/arena_internal.h
     include/common.h
     include/common.h.gch
     include/bytecode.h
