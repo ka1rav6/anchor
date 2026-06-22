@@ -1,4 +1,3 @@
-#include "../include/uthash.h"
 #include "../include/engine.h"
 
 /* ── pass/fail counters ──────────────────────────────────────────────────── */
@@ -42,17 +41,17 @@ void printAST(Node* n, int depth){
     }
 }
 
-void printFactDB(FactDB* db){
-    printf("=== FACT DB ===\n");
-    printf("[BOOL FACTS]\n");
-    BoolFact* bf, *btmp;
-    HASH_ITER(hh, db->boolFacts, bf, btmp)
-        printf("  %s = %s\n", bf->name, bf->val ? "true" : "false");
-    printf("[NUM FACTS]\n");
-    NumFact* nf, *ntmp;
-    HASH_ITER(hh, db->numFacts, nf, ntmp)
-        printf("  %s = %.2f\n", nf->name, nf->val);
-    printf("================\n\n");
+/* printFactDB is now provided by the library itself (factdb.h) -- it has
+ * to live there since FactDB's hash tables are no longer visible here. */
+
+/* Visitor passed to rule_engine_for_each -- prints one rule's name, action,
+ * and AST. Receives only a Rule* to use with the rule_*() accessors; it
+ * cannot see Rule's fields directly since the struct is opaque here. */
+void print_rule_visitor(Rule* r, void* user_ctx){
+    (void)user_ctx;
+    printf("Rule: %s  ->  action: %s\n", rule_name(r), rule_action(r));
+    printAST(rule_condition(r), 1);
+    printf("\n");
 }
 
 /* ── callbacks ───────────────────────────────────────────────────────────── */
@@ -144,15 +143,10 @@ int main(void){
 
 
     printf("\n=== FACT DATABASE ===\n");
-    printFactDB(e->db);
+    printFactDB(engine_get_factdb(e));
 
     printf("=== RULE ASTs ===\n");
-    Rule* r; Rule* tmp;
-    HASH_ITER(hh, e->r_engine->rules, r, tmp){
-        printf("Rule: %s  ->  action: %s\n", r->ruleName, r->action);
-        printAST(r->condition, 1);
-        printf("\n");
-    }
+    rule_engine_for_each(engine_get_rule_engine(e), print_rule_visitor, NULL);
 
     printf("=== RUNNING ENGINE ===\n");
     runEngine(e);

@@ -1,4 +1,4 @@
-#include "../include/ActionEntry.h"
+#include "../include/ActionEntry_internal.h"
 
 void registerAction(ActionEntry** g_registry, const char* action, Action_f func, void* ctx) {
     ActionEntry* e = malloc(sizeof(ActionEntry));
@@ -24,4 +24,12 @@ void freeRegistry(ActionEntry** g_registry) {
         HASH_DEL(*g_registry, e);
         free(e);
     }
+}
+
+Action_f action_entry_func(const ActionEntry* e) {
+    return e ? e->func : NULL;
+}
+
+void* action_entry_ctx(const ActionEntry* e) {
+    return e ? e->ctx : NULL;
 }

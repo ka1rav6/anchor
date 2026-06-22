@@ -1,6 +1,6 @@
 #include "../include/semanticChecker.h"
 #include "../include/rule.h"
-#include "../include/uthash.h"
+#include "../include/factdb_internal.h"
 
 // checks if the operator is valid
 bool isOperator(const char* op){
@@ -15,33 +15,21 @@ bool isOperator(const char* op){
 
 bool isComparisonCorrect(FactDB* db, const char* factname){
     // checking if factname [ a numfact ] is being compared to a bool [ bool fact ]
-    BoolFact* f;
-    HASH_FIND_STR(db->boolFacts, factname, f);
-    if (!f)
-        return true;
-    return false;
+    return !factdb_has_bool(db, factname);
 }
 // checks if the fact exists in the database already
 bool factExists(FactDB* db, const char* fact, factType t){
     switch (t){ // hence it only has to search through one type
-        case BOOL:{
-            BoolFact* f;
-            HASH_FIND_STR(db->boolFacts, fact, f);
-            return (bool)f;
-        }
-        case NUM:{
-            NumFact* f;
-            HASH_FIND_STR(db->numFacts, fact, f);
-            return (bool)f;
-        }
+        case BOOL:
+            return factdb_has_bool(db, fact);
+        case NUM:
+            return factdb_has_num(db, fact);
     }
     return false;
 }
 // checks if the rule name already exists in the database ()
 bool duplicateRule(RuleEngine* e, const char* name){
-    Rule* r;
-    HASH_FIND_STR(e->rules, name, r);
-    return (bool)r;
+    return findRule(e, name) != NULL;
 }
 
 
