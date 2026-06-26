@@ -69,17 +69,21 @@ public:
     std::string text; // for identifiers
     double number;    // for numeric values
     Token(TokenType, std::string, double);
+    Token(TokenType, const std::string);
+    Token(TokenType, double);
 };
 
-class TokenStream{
+
+
+class Line{
 private:
     std::vector<Token> tokens;
 public:
-    TokenStream()  = default;
-    ~TokenStream() = default;
-    TokenStream(const TokenStream&) = delete;
-    TokenStream(TokenStream&&) = delete;
-    TokenStream& operator<<(const Token& t){
+    Line()  = default;
+    ~Line() = default;
+    Line(const Line&) = delete;
+    Line(Line&&) = delete;
+    Line& operator<<(const Token& t){
         tokens.emplace_back(t);
         return *this;
     }
@@ -89,5 +93,25 @@ public:
     std::vector<Token> getTokens(){
         return tokens;
     }
+};
+
+class TokenStream{
+    private:
+        std::vector<Line> lines;
+    public:
+        TokenStream()  = default;
+        ~TokenStream() = default;
+        TokenStream(const TokenStream&) = default;
+        TokenStream(TokenStream&&) = default;
+        TokenStream& operator<<(const Line& l){
+            lines.emplace_back(l);
+            return *this;
+        }
+        size_t getLine(){
+            return lines.size();
+        }
+        std::vector<Line> getTokens(){
+            return lines;
+        }
 };
 TokenStream* processFile(const std::string filename, Arena* ar);
