@@ -5,6 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <cctype>
 #include "arena.h"
 /*
 NOTE THE ASSUMPTIONS:
