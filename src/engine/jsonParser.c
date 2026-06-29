@@ -1,12 +1,15 @@
-#include "rule_internal.h"
-#include "jsonParser.h"
-#include "semanticChecker.h"
-#include "bytecode.h"
+#include "../../include/rule_internal.h"
+#include "../../include/jsonParser.h"
+#include "../../include/semanticChecker.h"
+#include "../../include/bytecode.h"
 
 // Checks if file exists in file system * by manually opening it and checking
 static bool fileExists(const char* filename) {
     FILE* file = fopen(filename, "r");
-    if (file) { fclose(file); return true; }
+    if (file) { 
+        fclose(file);
+        return true;
+    }
     return false;
 }
 
@@ -32,9 +35,10 @@ RuleEngine* build_ast(yyjson_doc* doc, FactDB* db, ActionEntry* g_registry){
     build_factdb(db, root);
     
     yyjson_val* rulesArr = yyjson_obj_get(root, "rules");
-    RuleEngine* engine = createRuleEngine(); // engine constructor
+    RuleEngine* engine   = createRuleEngine(); // engine constructor
 
-    size_t idx = 0, max = 0; // these values are modified inside the for each loop
+    size_t idx = 0;
+    size_t max = 0;          // these values are modified inside the for each loop
     yyjson_val* rule = NULL;
 
     yyjson_arr_foreach(rulesArr, idx, max, rule){ // built in iteration of yyjson
@@ -59,7 +63,7 @@ RuleEngine* build_ast(yyjson_doc* doc, FactDB* db, ActionEntry* g_registry){
             r->ctx  = action_entry_ctx(ae);
         }
         r->condition = build_node(engine->arena, db, cond);
-        r->bc = compileNode(engine->arena, r->condition);
+        r->bc        = compileNode(engine->arena, r->condition);
         if (duplicateRule(engine, r->ruleName)){
             FATAL("Two different rules have the same name : %s", r->ruleName);
         }
@@ -81,21 +85,21 @@ static Node* build_node(Arena* ar, FactDB* db, yyjson_val* v){
     yyjson_obj_iter_init(v, &iter);
     yyjson_val* key;
     while ((key = yyjson_obj_iter_next(&iter))){
-        const char* op = yyjson_get_str(key);
+        const char* op  = yyjson_get_str(key);
         yyjson_val* val = yyjson_obj_iter_get_val(key);
         if (!isOperator(op)){
             FATAL("Not a valid operator : %s\n", op);
         }
         if (strcmp(op, "and") == 0)
             return build_and_or(ar, db, val, NODE_AND);
-        if (strcmp(op, "or") == 0)
+        if (strcmp(op, "or")  == 0)
             return build_and_or(ar, db, val, NODE_OR);
         if (strcmp(op, "not") == 0)
             return build_not(ar, db, val);
 
-        if (strcmp(op, ">") == 0 || strcmp(op, "<") == 0 ||
+        if (strcmp(op, ">")  == 0 || strcmp(op, "<")  == 0 ||
             strcmp(op, ">=") == 0 || strcmp(op, "<=") == 0 ||
-            strcmp(op, "==") == 0 || strcmp(op, "!=") == 0)
+            strcmp(op, "==") == 0 || strcmp(op, "!=") == 0 )
         {
             return build_compare(ar, db, op, val);
         }
@@ -119,7 +123,7 @@ static Node* build_compare(Arena* ar, FactDB* db, const char* op, yyjson_val* ar
     Node* n = createNode(ar, NODE_COMPARE); // Pass ar
     n->data.Compare.val = NAN;  
 
-    yyjson_val* left  =  yyjson_arr_get(arr, 0);  // LHS of comparison
+    yyjson_val* left  = yyjson_arr_get(arr, 0);  // LHS of comparison
     yyjson_val* right = yyjson_arr_get(arr, 1); // RHS of comparison
 
     n->data.Compare.factName = arena_strdup(ar, yyjson_get_str(left)); // string is duplicated and stored in the arena itself
@@ -139,7 +143,7 @@ static Node* build_compare(Arena* ar, FactDB* db, const char* op, yyjson_val* ar
     // assigning appropriate enum according to symbol
     if (strcmp(op, ">") == 0)       
         n->data.Compare.op = OP_GT;
-    else if (strcmp(op, "<" )  == 0)  
+    else if (strcmp(op, "<" ) == 0)  
         n->data.Compare.op = OP_LT;
     else if (strcmp(op, ">=") == 0) 
         n->data.Compare.op = OP_GE;

@@ -1,4 +1,4 @@
-#include "arena_internal.h"
+#include "../../include/arena_internal.h"
 
 // aligns the allocator memory to align up (3 bytes -> 8 bytes)
 static inline size_t align_up(size_t n, size_t alignment) {
@@ -22,8 +22,8 @@ Arena* createArena(size_t size) {
         FATAL("Could not allocate Arena struct\n");
     }
     ar->start = ask_memory(size);
-    ar->used = 0;
-    ar->size = size;
+    ar->used  = 0;
+    ar->size  = size;
     if (pthread_mutex_init(&ar->lock, NULL) != 0) {
         FATAL("Could not initialize arena mutex\n");
     }
@@ -35,7 +35,6 @@ Arena* createArena(size_t size) {
 // since multiple threads may try to allocate from the same arena concurrently.
 void* arena_alloc(Arena* ar, size_t size) {
     if (!ar || size == 0) return NULL;
-
     pthread_mutex_lock(&ar->lock);
 
     size_t aligned = align_up(ar->used, ARENA_ALIGNMENT);
@@ -44,7 +43,7 @@ void* arena_alloc(Arena* ar, size_t size) {
         FATAL("Arena out of memory: %zu bytes requested\n", size);
     }
     void* loc = ar->start + aligned;
-    ar->used = aligned + size;
+    ar->used  = aligned + size;
 
     pthread_mutex_unlock(&ar->lock);
     return loc;

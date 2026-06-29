@@ -1,4 +1,4 @@
-#include "factdb_internal.h"
+#include "../../include/factdb_internal.h"
 
 // gets the value of a numeric fact from the fact DB by searching for its name.
 // Thread-safe: read-locked, since multiple readers can look up facts concurrently.
@@ -41,9 +41,9 @@ bool evaluate(FactDB* db, Node* n){
             // compare the operator and return whether the comparison is correct
             switch(n->data.Compare.op){
                 case OP_LT:
-                    return lhs < rhs;
+                    return lhs <  rhs;
                 case OP_GT:
-                    return lhs > rhs;
+                    return lhs >  rhs;
                 case OP_LE:
                     return lhs <= rhs;
                 case OP_GE:
@@ -69,7 +69,7 @@ FactDB* createFactDB(){
     }
     memset(temp, 0, sizeof(FactDB));
     temp->boolFacts = NULL;
-    temp->numFacts = NULL;
+    temp->numFacts  = NULL;
     if (pthread_rwlock_init(&temp->lock, NULL) != 0){
         FATAL("Could not initialize FactDB lock\n");
     }
@@ -85,13 +85,13 @@ void deleteFactDB(FactDB* db){
     }
     BoolFact* currBool, *tempBool;
     HASH_ITER(hh, db->boolFacts, currBool, tempBool){
-        HASH_DEL(db->boolFacts, currBool);
+        HASH_DEL(db->boolFacts,  currBool);
         free(currBool);
     }
     currBool = NULL;
     tempBool = NULL;
-    currNum = NULL;
-    tempNum = NULL;
+    currNum  = NULL;
+    tempNum  = NULL;
     pthread_rwlock_destroy(&db->lock);
     free(db);
 }

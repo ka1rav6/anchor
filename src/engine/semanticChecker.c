@@ -1,6 +1,6 @@
-#include "semanticChecker.h"
-#include "rule.h"
-#include "factdb_internal.h"
+#include "../../include/semanticChecker.h"
+#include "../../include/rule.h"
+#include "../../include/factdb_internal.h"
 
 // checks if the operator is valid
 bool isOperator(const char* op){
@@ -11,7 +11,6 @@ bool isOperator(const char* op){
     }
     return false;
 }
-
 
 bool isComparisonCorrect(FactDB* db, const char* factname){
     // checking if factname [ a numfact ] is being compared to a bool [ bool fact ]
