@@ -31,9 +31,6 @@ COND isAdmin AND (age > 18)
 RULE $canAccess isAdmin
 RULE $cantAccess age < 18
 
-
-
-
 expression  -> term ( (AND | OR) term )*
 term        -> NOT term | primary
 primary     -> IDENT | '(' expression ')' | comparison

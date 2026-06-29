@@ -1,4 +1,4 @@
-#include "engine_internal.h"
+#include "../../include/engine_internal.h"
 
 // Engine constructor. To be called by the user.
 Engine* createEngine(const char* json_file){
@@ -13,8 +13,8 @@ Engine* createEngine(const char* json_file){
         FATAL("ERROR: the engine cannot be created with a NULL json file\n");
     }
     temp->json_file = json_file;
-    temp->db = createFactDB();
-    temp->r_engine = build_ast(parseJSON(json_file), temp->db, temp->action_registry);
+    temp->db        = createFactDB();
+    temp->r_engine  = build_ast(parseJSON(json_file), temp->db, temp->action_registry);
     if (pthread_mutex_init(&temp->lock, NULL) != 0) {
         FATAL("Could not initialize Engine mutex\n");
     }
@@ -33,7 +33,7 @@ void deleteEngine(Engine* e){
 // to register the action in the action registry.
 void registerTheAction(Engine* e, const char* name, Action_f f, void* ctx){
     pthread_mutex_lock(&e->lock);
-    registerAction(&e->action_registry, name, f, ctx);
+    registerAction( &e->action_registry, name, f, ctx);
     rule_engine_bind_action(e->r_engine, name, f, ctx);
     pthread_mutex_unlock(&e->lock);
 }
