@@ -1,12 +1,12 @@
-#include "bytecode.h"
+#include "../../include/bytecode.h"
 
 // constructor for the bytecode
 static Bytecode* createBytecode(Arena* ar)
 {
     Bytecode* bc = (Bytecode*)arena_alloc(ar, sizeof(Bytecode));
     bc->capacity = 8;
-    bc->count = 0;
-    bc->code = (Instr*)arena_alloc(ar, sizeof(Instr) * bc->capacity);
+    bc->count    = 0;
+    bc->code     = (Instr*)arena_alloc(ar, sizeof(Instr) * bc->capacity);
     return bc;
 }
 
@@ -15,15 +15,17 @@ static void emit(Arena* ar, Bytecode* bc, Instr i)
 {
     if (bc->count >= bc->capacity)
     {
-        Instr* old = bc->code;
-        int newCap = bc->capacity * 2;
+        Instr* old   = bc->code;
+        int newCap   = bc->capacity * 2;
         Instr* grown = (Instr*)arena_alloc(ar, sizeof(Instr) * newCap);
         memcpy(grown, old, sizeof(Instr) * bc->count);
-        bc->code = grown;
+        bc->code     = grown;
         bc->capacity = newCap;
     }
     bc->code[bc->count++] = i;
 }
+
+
 // recursive function that evaluates and creates bytecode accordingly
 static void compileWalk(Arena* ar, Bytecode* bc, Node* n)
 {
@@ -58,7 +60,7 @@ static void compileWalk(Arena* ar, Bytecode* bc, Node* n)
         case NODE_FACT:
         {
             Instr i;
-            i.op = OP_PUSH_FACT;
+            i.op       = OP_PUSH_FACT;
             i.factName = n->data.Fact.factName; 
             emit(ar, bc, i);
             break;
@@ -66,10 +68,10 @@ static void compileWalk(Arena* ar, Bytecode* bc, Node* n)
         case NODE_COMPARE:
         {
             Instr i;
-            i.op = OP_PUSH_CMP;
+            i.op       = OP_PUSH_CMP;
             i.factName = n->data.Compare.factName;
-            i.cmp = n->data.Compare.op;
-            i.val = n->data.Compare.val;
+            i.cmp      = n->data.Compare.op;
+            i.val      = n->data.Compare.val;
             emit(ar, bc, i);
             break;
         }
@@ -160,10 +162,10 @@ const char* cmpOpStr[] = {
 
 const char* opcode_str[] = {
                             "OP_PUSH_FACT",
-                            "OP_PUSH_CMP",
-                            "OP_AND",
-                            "OP_OR",
-                            "OP_NOT",
+                            "OP_PUSH_CMP" ,
+                            "OP_AND"      ,
+                            "OP_OR"       ,
+                            "OP_NOT"      ,
                             "OP_HALT"
                            };
 
@@ -173,17 +175,19 @@ void printByteCode(Bytecode* bc){
     fp = fopen("re.vela.cache", "w");
 
     for (size_t i = 0; i < bc->count; i++){
+
         const char* OpC = opcode_str[bc->code[i].op];
-        fprintf(fp, "%s\n", OpC);
+        fprintf(fp, "%s\n", OpC);                                 // first printing out the opcode
+
         if (bc->code[i].op == OP_PUSH_CMP){
             const char* cmpOp = cmpOpStr[bc->code[i].cmp];
-            fprintf(fp, "%s\n", cmpOp);
+            fprintf(fp, "%s\n", cmpOp);                           // then the operator
             fprintf(fp, "%lf\n", bc->code[i].val);
-            fprintf(fp, "Factname : %s\n", bc->code[i].factName);
+            fprintf(fp, "Factname : %s\n", bc->code[i].factName); // then the fact name
             fprintf(fp, "\n\n");
         }
         else if (bc->code[i].op == OP_PUSH_FACT){
-            fprintf(fp, "Factname : %s\n", bc->code[i].factName);
+            fprintf(fp, "Factname : %s\n", bc->code[i].factName); // or simiply the fact name
             fprintf(fp, "\n\n");
         }
         else {
