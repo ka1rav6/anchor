@@ -1,7 +1,7 @@
-#include "../include/rule_internal.h"
-#include "../include/jsonParser.h"
-#include "../include/semanticChecker.h"
-#include "../include/bytecode.h"
+#include "rule_internal.h"
+#include "jsonParser.h"
+#include "semanticChecker.h"
+#include "bytecode.h"
 
 // Checks if file exists in file system * by manually opening it and checking
 static bool fileExists(const char* filename) {

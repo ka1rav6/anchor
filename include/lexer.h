@@ -43,7 +43,7 @@ OP          -> < | > | <= | >= | == | !=
  *
  * */
 
-namespace VelaLang{
+namespace Velang{
 enum class TokenType{
     TOK_RULE,
     TOK_FACT,
@@ -114,4 +114,4 @@ class TokenStream{
         }
 };
 TokenStream* processFile(const std::string filename, Arena* ar);
-} // namespace VelaLang
+} // namespace Velang

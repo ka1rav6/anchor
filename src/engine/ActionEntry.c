@@ -1,4 +1,4 @@
-#include "../include/ActionEntry_internal.h"
+#include "ActionEntry_internal.h"
 
 void registerAction(ActionEntry** g_registry, const char* action, Action_f func, void* ctx) {
     ActionEntry* e = malloc(sizeof(ActionEntry));

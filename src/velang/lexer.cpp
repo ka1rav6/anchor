@@ -2,7 +2,7 @@
 
 #include <fstream>
 
-namespace VelaLang{
+namespace Velang{
 Token::Token(TokenType type, const std::string s){
     this->type = type;
     this->text = s;
@@ -124,4 +124,4 @@ TokenStream* processFile(const std::string filename, Arena* ar){
     }
     return ts;
 }
-} // namespace VelaLang
+} // namespace Velang

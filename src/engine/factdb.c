@@ -1,4 +1,4 @@
-#include "../include/factdb_internal.h"
+#include "factdb_internal.h"
 
 // gets the value of a numeric fact from the fact DB by searching for its name.
 // Thread-safe: read-locked, since multiple readers can look up facts concurrently.

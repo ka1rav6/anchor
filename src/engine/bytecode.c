@@ -1,4 +1,4 @@
-#include "../include/bytecode.h"
+#include "bytecode.h"
 
 // constructor for the bytecode
 static Bytecode* createBytecode(Arena* ar)

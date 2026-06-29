@@ -1,5 +1,6 @@
-#include "common.h"
+#pragma once
 
+#include "common.h"
 #include <yyjson.h>
 #include "rule.h"
 #include "ActionEntry.h"

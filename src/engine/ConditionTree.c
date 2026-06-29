@@ -1,4 +1,4 @@
-#include "../include/ConditionTree.h"
+#include "ConditionTree.h"
 
 
 // Node constructor that allocates memory for a new node and initializes its type and data

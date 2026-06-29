@@ -8,16 +8,18 @@ find_library(YYJSON_LIB yyjson REQUIRED)
 find_package(Threads REQUIRED)
 
 add_executable(engine
-    src/factdb.c
-    src/rule.c
-    src/ConditionTree.c
-    src/testFuncs.c
-    src/jsonParser.c
-    src/semanticChecker.c
-    src/engine.c
-    src/ActionEntry.c
-    src/arena.c
-    src/bytecode.c
+    ## C files
+    src/engine/factdb.c
+    src/engine/rule.c
+    src/engine/ConditionTree.c
+    src/engine/testFuncs.c
+    src/engine/jsonParser.c
+    src/engine/semanticChecker.c
+    src/engine/engine.c
+    src/engine/ActionEntry.c
+    src/engine/arena.c
+    src/engine/bytecode.c
+    # .h files
     include/uthash.h
     include/ConditionTree.h
     include/factdb.h
@@ -33,14 +35,15 @@ add_executable(engine
     include/arena.h
     include/arena_internal.h
     include/common.h
-    include/common.h.gch
     include/bytecode.h
 
     ## C++
     include/lexer.h
-    src/lexer.cpp
+    src/velang/lexer.cpp
 
 )
+
+target_include_directories(engine PRIVATE ${CMAKE_SOURCE_DIR}/include)
 
 # Debug + gprof profiling
 target_compile_options(engine PRIVATE

@@ -1,6 +1,6 @@
-#include "../include/rule_internal.h" 
-#include "../include/arena.h"
-#include "../include/bytecode.h"
+#include "rule_internal.h" 
+#include "arena.h"
+#include "bytecode.h"
 
 
 // ----------- ACTUAL FUNCTIONS -------------//
