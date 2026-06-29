@@ -71,15 +71,12 @@ export class Token{
 
 export class Line{
     private tokens: Token[] = [];
-
     push(t: Token): void{
         this.tokens.push(t);
     }
-
     get length(): number{
         return this.tokens.length;
     }
-
     getTokens(): Token[]{
         return this.tokens;
     }
@@ -109,8 +106,8 @@ function isalnum(c: string): boolean{
 }
 
 function processLine(line: string, lineNum: number): Line{
-    const l = new Line();
-    for (let i = 0; i < line.length; ++i){
+    const l      = new Line();
+    for (let i   = 0; i < line.length; ++i){
         const ch = line[i];
         switch (ch){
             case ' ': continue;
@@ -161,7 +158,6 @@ function processLine(line: string, lineNum: number): Line{
             case '(':
                 l.push(new Token(TokenType.TOK_LPAREN, "("));
                 break;
-
             case ')':
                 l.push(new Token(TokenType.TOK_RPAREN, ")"));
                 break;
@@ -174,8 +170,7 @@ function processLine(line: string, lineNum: number): Line{
                         if (!isnum(line[i]) && line[i] !== '.'){
                             throw new Error("Number contains letter inside: line : " + lineNum);
                         }
-                        num += line[i];
-                        ++i;
+                        num += line[i++];
                     }
                     --i;
                     l.push(new Token(TokenType.TOK_NUMBER, parseFloat(num)));
@@ -183,17 +178,15 @@ function processLine(line: string, lineNum: number): Line{
                     let word = "";
                     word += ch;
                     ++i;
-                    while (i < line.length && (isalnum(line[i]) || line[i] === '_')){
-                        word += line[i];
-                        ++i;
-                    }
+                    while (i < line.length && (isalnum(line[i]) || line[i] === '_'))
+                        word += line[i++];
                     --i;
-                    if (word === "RULE") l.push(new Token(TokenType.TOK_RULE, word));
+                    if      (word === "RULE") l.push(new Token(TokenType.TOK_RULE, word));
                     else if (word === "FACT") l.push(new Token(TokenType.TOK_FACT, word));
                     else if (word === "COND") l.push(new Token(TokenType.TOK_COND, word));
-                    else if (word === "AND") l.push(new Token(TokenType.TOK_AND, word));
-                    else if (word === "OR") l.push(new Token(TokenType.TOK_OR, word));
-                    else if (word === "NOT") l.push(new Token(TokenType.TOK_NOT, word));
+                    else if (word === "AND")  l.push(new Token(TokenType.TOK_AND, word));
+                    else if (word === "OR")   l.push(new Token(TokenType.TOK_OR, word));
+                    else if (word === "NOT")  l.push(new Token(TokenType.TOK_NOT, word));
                     else l.push(new Token(TokenType.TOK_IDENT, word));
                 }
                 break;
@@ -205,8 +198,8 @@ function processLine(line: string, lineNum: number): Line{
 import fs from 'fs';
 
 export function processFile(filename: string): TokenStream{
-    const data = fs.readFileSync(filename, 'utf8');
-    const ts = new TokenStream();
+    const data  = fs.readFileSync(filename, 'utf8');
+    const ts    = new TokenStream();
     const lines = data.split('\n');
     let lineNum = 0;
     for (const line of lines){
