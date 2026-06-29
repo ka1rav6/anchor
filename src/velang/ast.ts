@@ -1,25 +1,60 @@
-import { TokenType as t_type} from "./lexer.js"
+export type Expr = BinaryExpr | UnaryExpr | ComparisonExpr | IdentExpr | NumberLiteral | BoolLiteral;
 
-export interface Expr{
-
+export interface BinaryExpr {
+    kind: "binary";
+    left: Expr;
+    right: Expr;
+    operator: "AND" | "OR";
 }
 
-export interface BinaryExpr{
-    left      : Expr                 ;
-    right     : Expr                 ;
-    operation ?: "AND" | "NOT" | "OR";
+export interface UnaryExpr {
+    kind: "unary";
+    operator: "NOT";
+    operand: Expr;
 }
 
-export interface RuleExpr{
-    decl : "RULE" | t_type.TOK_RULE ;
-    name : t_type.TOK_IDENT         ;
-    expr : BinaryExpr               ;
+export interface ComparisonExpr {
+    kind: "comparison";
+    left: string;
+    operator: "<" | ">" | "<=" | ">=" | "==" | "!=";
+    right: number;
 }
 
-export interface FactExpr{
-    decl  : "FACT" | t_type.TOK_FACT;
-    name  : t_type.TOK_IDENT        ;
-    value : number | boolean | Expr ;
+export interface IdentExpr {
+    kind: "ident";
+    name: string;
 }
 
+export interface NumberLiteral {
+    kind: "number";
+    value: number;
+}
 
+export interface BoolLiteral {
+    kind: "bool";
+    value: boolean;
+}
+
+export type Statement = RuleStmt | FactStmt | CondStmt;
+
+export interface RuleStmt {
+    kind: "rule";
+    name: string;
+    expr: Expr;
+}
+
+export interface FactStmt {
+    kind: "fact";
+    name: string;
+    value: number | boolean;
+}
+
+export interface CondStmt {
+    kind: "cond";
+    expr: Expr;
+}
+
+export interface Program {
+    kind: "program";
+    statements: Statement[];
+}
