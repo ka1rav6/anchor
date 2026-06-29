@@ -56,50 +56,21 @@ export enum TokenType{
     TOK_EQ, TOK_NE,
     TOK_LPAREN,
     TOK_RPAREN,
-    TOK_END
+    TOK_EOF
 }
 
-export class Token{
+export type Token = {
     type: TokenType;
-    text: string = "";
-    number: number = 0;
+    text: string;
+    number: number;
+};
 
-    constructor(type: TokenType, text: string);
-    constructor(type: TokenType, number: number);
-    constructor(type: TokenType, arg: string | number){
-        this.type = type;
-        if (typeof arg === "string"){
-            this.text = arg;
-        } else {
-            this.number = arg;
-        }
-    }
-}
-
-export class Line{
-    private tokens: Token[] = [];
-    push(t: Token): void{
-        this.tokens.push(t);
-    }
-    get length(): number{
-        return this.tokens.length;
-    }
-    getTokens(): Token[]{
-        return this.tokens;
-    }
-}
-
-export class TokenStream{
-    private lines: Line[] = [];
-    push(l: Line): void{
-        this.lines.push(l);
-    }
-    get length(): number{
-        return this.lines.length;
-    }
-    getLines(): Line[]{
-        return this.lines;
-    }
+function token(type: TokenType, text: string)  : Token;
+function token(type: TokenType, number: number): Token;
+function token(type: TokenType, arg: string | number): Token {
+    return typeof arg === "string"
+        ? { type, text: arg, number: 0 }
+        : { type, text: "", number: arg };
 }
 
 function isnum(c: string): boolean{
@@ -112,39 +83,39 @@ function isalnum(c: string): boolean{
     return isalpha(c) || isnum(c);
 }
 
-function processLine(line: string, lineNum: number): Line{
-    const l      = new Line();
+export function processLine(line: string, lineNum: number): Token[]{
+    const tokens: Token[] = [];
     for (let i   = 0; i < line.length; ++i){
         const ch = line[i];
         switch (ch){
             case ' ': continue;
-            case '#': return l;
+            case '#': return tokens;
             case '>':
                 if (i + 1 < line.length && line[i + 1] === '='){
-                    l.push(new Token(TokenType.TOK_GE, ">="));
+                    tokens.push(token(TokenType.TOK_GE, ">="));
                     ++i;
-                } else l.push(new Token(TokenType.TOK_GT, ">"));
+                } else tokens.push(token(TokenType.TOK_GT, ">"));
                 break;
             case '<':
                 if (i + 1 < line.length && line[i + 1] === '='){
-                    l.push(new Token(TokenType.TOK_LE, "<="));
+                    tokens.push(token(TokenType.TOK_LE, "<="));
                     ++i;
-                } else l.push(new Token(TokenType.TOK_LT, "<"));
+                } else tokens.push(token(TokenType.TOK_LT, "<"));
                 break;
             case '=':
                 if (i + 1 < line.length && line[i + 1] === '='){
-                    l.push(new Token(TokenType.TOK_EQ, "=="));
+                    tokens.push(token(TokenType.TOK_EQ, "=="));
                     ++i;
                 }
                 break;
             case '!':
                 if (i + 1 < line.length && line[i + 1] === '='){
-                    l.push(new Token(TokenType.TOK_NE, "!="));
+                    tokens.push(token(TokenType.TOK_NE, "!="));
                     ++i;
                 }
                 break;
             case '$':{
-                l.push(new Token(TokenType.TOK_DOLLAR, "$"));
+                tokens.push(token(TokenType.TOK_DOLLAR, "$"));
                 let ident = "";
                 ++i;
                 while (i < line.length && line[i] !== ' '){
@@ -159,28 +130,25 @@ function processLine(line: string, lineNum: number): Line{
                     ++i;
                 }
                 --i;
-                l.push(new Token(TokenType.TOK_IDENT, ident));
+                tokens.push(token(TokenType.TOK_IDENT, ident));
                 break;
             }
             case '(':
-                l.push(new Token(TokenType.TOK_LPAREN, "("));
+                tokens.push(token(TokenType.TOK_LPAREN, "("));
                 break;
             case ')':
-                l.push(new Token(TokenType.TOK_RPAREN, ")"));
+                tokens.push(token(TokenType.TOK_RPAREN, ")"));
                 break;
             default:
                 if (isnum(ch)){
                     let num = "";
                     num += ch;
                     ++i;
-                    while (i < line.length && line[i] !== ' '){
-                        if (!isnum(line[i]) && line[i] !== '.'){
-                            throw new Error("Number contains letter inside: line : " + lineNum);
-                        }
+                    while (i < line.length && (isnum(line[i]) || line[i] === '.')){
                         num += line[i++];
                     }
                     --i;
-                    l.push(new Token(TokenType.TOK_NUMBER, parseFloat(num)));
+                    tokens.push(token(TokenType.TOK_NUMBER, parseFloat(num)));
                 } else if (isalpha(ch) || ch === '_'){
                     let word = "";
                     word += ch;
@@ -188,30 +156,31 @@ function processLine(line: string, lineNum: number): Line{
                     while (i < line.length && (isalnum(line[i]) || line[i] === '_'))
                         word += line[i++];
                     --i;
-                    if      (word === "RULE") l.push(new Token(TokenType.TOK_RULE, word));
-                    else if (word === "FACT") l.push(new Token(TokenType.TOK_FACT, word));
-                    else if (word === "COND") l.push(new Token(TokenType.TOK_COND, word));
-                    else if (word === "AND")  l.push(new Token(TokenType.TOK_AND , word));
-                    else if (word === "OR")   l.push(new Token(TokenType.TOK_OR  , word));
-                    else if (word === "NOT")  l.push(new Token(TokenType.TOK_NOT , word));
-                    else l.push(new Token(TokenType.TOK_IDENT, word));
+                    if      (word === "RULE") tokens.push(token(TokenType.TOK_RULE, word));
+                    else if (word === "FACT") tokens.push(token(TokenType.TOK_FACT, word));
+                    else if (word === "COND") tokens.push(token(TokenType.TOK_COND, word));
+                    else if (word === "AND")  tokens.push(token(TokenType.TOK_AND , word));
+                    else if (word === "OR")   tokens.push(token(TokenType.TOK_OR  , word));
+                    else if (word === "NOT")  tokens.push(token(TokenType.TOK_NOT , word));
+                    else tokens.push(token(TokenType.TOK_IDENT, word));
                 }
                 break;
         }
     }
-    return l;
+    return tokens;
 }
 
 import fs from 'fs';
 
-export function processFile(filename: string): TokenStream{
+export function processFile(filename: string): Token[][]{
     const data  = fs.readFileSync(filename, 'utf8');
-    const ts    = new TokenStream();
     const lines = data.split('\n');
+    const result: Token[][] = [];
     let lineNum = 0;
     for (const line of lines){
         lineNum++;
-        ts.push(processLine(line, lineNum));
+        result.push(processLine(line, lineNum));
     }
-    return ts;
+    result.push([token(TokenType.TOK_EOF, "")]);
+    return result;
 }
