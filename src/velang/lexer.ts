@@ -191,9 +191,9 @@ function processLine(line: string, lineNum: number): Line{
                     if      (word === "RULE") l.push(new Token(TokenType.TOK_RULE, word));
                     else if (word === "FACT") l.push(new Token(TokenType.TOK_FACT, word));
                     else if (word === "COND") l.push(new Token(TokenType.TOK_COND, word));
-                    else if (word === "AND")  l.push(new Token(TokenType.TOK_AND, word));
-                    else if (word === "OR")   l.push(new Token(TokenType.TOK_OR, word));
-                    else if (word === "NOT")  l.push(new Token(TokenType.TOK_NOT, word));
+                    else if (word === "AND")  l.push(new Token(TokenType.TOK_AND , word));
+                    else if (word === "OR")   l.push(new Token(TokenType.TOK_OR  , word));
+                    else if (word === "NOT")  l.push(new Token(TokenType.TOK_NOT , word));
                     else l.push(new Token(TokenType.TOK_IDENT, word));
                 }
                 break;
