@@ -202,8 +202,9 @@ function processLine(line: string, lineNum: number): Line{
     return l;
 }
 
+import fs from 'fs';
+
 export function processFile(filename: string): TokenStream{
-    const fs = require('fs');
     const data = fs.readFileSync(filename, 'utf8');
     const ts = new TokenStream();
     const lines = data.split('\n');
