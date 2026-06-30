@@ -87,6 +87,10 @@ function createHeader(magic: number, version: number, instrNum: number): Buffer 
     return buf;
 }
 
+// iterates through program statements and converts everything into buffers
+// each buffer contains binary bytecode
+// headers for binary files are also created here
+// all buffers are compiled and concatinated in the end
 export default function toBytecode(fileName: string, program: Program): void {
     const chunks: Buffer[] = [];
     let instrCount = 0; // calculated through the loop and ultimately written out to the header of the binary
